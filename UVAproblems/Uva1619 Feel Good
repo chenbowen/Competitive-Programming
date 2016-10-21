@@ -1,0 +1,52 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <stack>
+#include <utility>
+using namespace std;
+const int maxn = 100000 + 3;
+int n, a[maxn], L[maxn], R[maxn];
+long long sum[maxn];
+
+
+void init() {
+    stack<pair<int, int> > s;
+    s.push(make_pair(-1, -1));
+    for (int i = 0; i < n; i++) {
+        while (s.top().first >= a[i]) s.pop();
+        L[i] = s.top().second;
+        s.push(make_pair(a[i], i));
+    }
+    while (!s.empty()) s.pop();
+    s.push(make_pair(-1, n));
+    for (int i = n - 1; i >= 0; i--) {
+        while (s.top().first >= a[i]) s.pop();
+        R[i] = s.top().second;
+        s.push(make_pair(a[i], i));
+    }
+}
+
+int main() {
+    int t = 0;
+    while (scanf("%d", &n) == 1 && n) {
+        if (++t > 1) putchar('\n');
+        for (int i = 0; i < n; i++) { 
+            scanf("%d", &a[i]); 
+            if (i == 0) sum[i] = a[i];
+            else sum[i] = sum[i - 1] + a[i];
+        }
+        init();
+        long long ans = 0, cur;
+        int ans_l = 1, ans_r = 1;
+        for (int i = 0; i < n; i++) {
+            cur = (sum[R[i] - 1] - sum[L[i]]) * (long long)a[i];
+            if (cur > ans) { 
+                ans = cur;
+                ans_l = L[i] + 2;
+                ans_r = R[i];
+            }
+        }
+        printf("%lld\n%d %d\n", ans, ans_l, ans_r);
+    }
+    return 0;
+}

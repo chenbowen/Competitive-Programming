@@ -1,0 +1,40 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+
+using namespace std;
+const int maxn = 100 + 3;
+int n, r, c, a[maxn][maxn], d[maxn][maxn];
+int dx[] = {0, -1, 0, 1}, dy[] = {1, 0, -1, 0};
+
+int dp(int x, int y) {
+    int &ans = d[x][y];
+    if (ans != -1) return ans;
+    ans = 1;
+    for (int i = 0; i < 4; i++) {
+        int nx = x + dx[i], ny = y + dy[i];
+        if (nx >= 0 && ny >= 0 && nx < r && ny < c && a[x][y] > a[nx][ny]) 
+            ans = max(ans, dp(nx, ny) + 1);
+    }
+    return ans;
+}
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while (T--) {
+        memset(d, -1, sizeof(d));
+        char s[maxn];
+        scanf("%s%d%d", s, &r, &c);
+        for (int i = 0; i < r; i++)
+            for (int j = 0; j < c; j++)
+                scanf("%d", &a[i][j]);
+        int ans = 1;
+        for (int i = 0; i < r; i++)
+            for (int j = 0; j < c; j++)
+                ans = max(ans, dp(i, j));
+        printf("%s: %d\n", s, ans);
+    }
+    return 0;
+}

@@ -1,0 +1,38 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+const int maxn = 1e6 + 5;
+typedef long long LL;
+LL prime[maxn];
+int len;
+bool vis[maxn];
+
+void init() {
+    int m = sqrt(maxn + 0.5);
+    for (int i = 2; i <= m; i++) if (!vis[i]) 
+        for (int j = i * i; j < maxn; j += i) vis[j] = 1;
+    
+    for (int i = 2; i < maxn; i++) if (!vis[i]) prime[len++] = i;
+}
+
+int check(LL l, LL u) {
+    int cnt = 0;
+    for (int i = 0; i < len; i++)
+        for (LL j = prime[i] * prime[i]; j <= u; j *= prime[i])
+            if (j >= l) cnt++;
+    return cnt;
+}
+
+int main() {
+    init();
+    int T;
+    LL L, U;
+    scanf("%d", &T);
+    while(T--) {
+        scanf("%lld%lld", &L, &U);
+        printf("%d\n", check(L, U));
+    }
+    return 0;
+}

@@ -1,0 +1,28 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <set>
+using namespace std;
+const int maxn = 1000000 + 5;
+int n, a[maxn];
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while (T--) {
+        scanf("%d", &n);
+        set<int> unq;
+        int ans = 0, _e = 0;
+        for (int i = 0; i < n; i++) scanf("%d", &a[i]);
+        for (int i = 0; i < n;) {
+            while (_e < n && !unq.count(a[_e])) unq.insert(a[_e++]);
+            ans = max(ans, _e - i);
+            if (_e == n) break;
+            do {
+                unq.erase(a[i++]);
+            } while (i < _e && a[i - 1] != a[_e]);
+        }
+        printf("%d\n", ans);
+    }
+    return 0;
+}

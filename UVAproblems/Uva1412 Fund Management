@@ -1,0 +1,107 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<vector>
+#include<map>
+#include<algorithm>
+
+using namespace std;
+const int maxm = 100 + 2, maxn = 8 + 1;
+const int maxstates = 15000; 
+const double inf = 1e30;
+int m, n, K, k[maxn], s[maxn];
+int op[maxm][maxstates], pre[maxm][maxstates];
+int buy_nxt[maxstates][maxn], sell_nxt[maxstates][maxn];
+double d[maxm][maxstates];
+vector<vector<int> > states;
+map<vector<int> , int> id;
+double c, price[maxm][maxn];
+char name[maxn][15];
+
+void print(int day, int s) {
+    if (day == 0) return;
+    print(day - 1, pre[day][s]);
+    if (op[day][s] == 0) printf("HOLD\n");
+    else if (op[day][s] > 0) printf("BUY %s\n", name[op[day][s] - 1]);
+    else printf("SELL %s\n", name[-op[day][s] - 1]);
+}
+
+void update(double p, int day, int idx, int o, int s) {
+    if (p > d[day][idx]) {
+        d[day][idx] = p;
+        op[day][idx] = o;
+        pre[day][idx] = s;
+    }
+}
+
+double dp() {
+    for (int i = 0; i <= m; i++)
+        for (int j = 0; j < states.size(); j++) d[i][j] = -inf;
+    d[0][0] = c;
+    for (int i = 0; i < m; i++) 
+        for (int j = 0; j < states.size(); j++) {
+            double p = d[i][j];
+            if (p < -1) continue;
+            update(p, i + 1, j, 0, j);
+            for (int kk = 0; kk < n; kk++) {
+                if (buy_nxt[j][kk] != -1 && p >= price[i][kk] - 1e-3) {
+                    update(p - price[i][kk], i + 1, buy_nxt[j][kk], kk + 1, j);
+                }
+                if (sell_nxt[j][kk] != -1)
+                    update(p + price[i][kk], i + 1, sell_nxt[j][kk], -kk - 1, j);
+            }
+        }
+    return d[m][0];
+}
+
+void build(int i, int tot, vector<int> &state) {
+    if (i == n) {
+        id[state] = states.size();
+        states.push_back(state);
+        return;
+    }
+    for (int j = 0; j + tot <= K && j <= k[i]; j++) {
+        state[i] = j;
+        build(i + 1, tot + j, state);
+    }
+}
+
+int main() {
+    int kase = 0;
+    while (scanf("%lf%d%d%d", &c, &m, &n, &K) == 4) {
+        if (++kase > 1) putchar('\n');
+        for (int i = 0; i < n; i++) {
+            scanf("%s%d%d", name[i], &s[i], &k[i]);
+            for (int j = 0; j < m; j++) {
+                scanf("%lf", &price[j][i]);
+                price[j][i] *= s[i];
+            }
+        }
+        states.clear();
+        id.clear();
+        vector<int> st(n);
+        build(0, 0, st);
+        for (int i = 0; i < states.size(); i++) {
+            vector<int> &state = states[i];
+            int tot = 0;
+            for (int j = 0; j < n; j++) tot += state[j];
+            for (int j = 0; j < n; j++) {
+                buy_nxt[i][j] = sell_nxt[i][j] = -1;
+                if (tot < K && state[j] < k[j]) {
+                    state[j]++;
+                    buy_nxt[i][j] = id[state];
+                    state[j]--;
+                }
+                if (state[j] != 0) {
+                    state[j]--;
+                    sell_nxt[i][j] = id[state];
+                    state[j]++;
+                }
+            }
+        }
+        
+        printf("%.2lf\n", dp());
+        print(m, 0);
+    }
+    return 0;
+}

@@ -1,0 +1,33 @@
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <list>
+using namespace std;
+const int MAXN = 100000 + 5;
+int D, N;
+char s[MAXN];
+
+int main() {
+    while (scanf("%d%d", &N, &D) != EOF) {
+        if (N == 0 && D == 0) break;
+        scanf("%s", s);
+        list<char> num;
+        for (int i = 0; i < N; i++) num.push_back(s[i]);
+        list<char>::iterator cur, nextn, temp, temp_begin;
+        cur = num.begin();
+        nextn = num.begin();
+        while (D) {
+            while (++nextn != num.end() && *cur >= *nextn) cur++;
+            temp_begin = num.begin();
+            temp = cur;
+            num.erase(cur);
+            if (temp == temp_begin) cur = num.begin();
+            else cur--;
+            nextn = cur;
+            D--;
+        }
+        for (cur = num.begin(); cur != num.end(); cur++) putchar(*cur);
+        putchar('\n');
+    }
+    return 0;
+}

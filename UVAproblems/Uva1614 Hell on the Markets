@@ -1,0 +1,44 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int maxn = 100000 + 3;
+int n;
+bool op[maxn];
+
+struct Stock {
+    int v, i;
+    Stock(int v = 0, int i = 0): v(v), i(i) {}
+    bool operator < (const Stock &rhs) const {
+        return v < rhs.v;
+    }
+}a[maxn];
+
+int main() {
+    while (scanf("%d", &n) == 1 && n) {
+        for (int i = 0; i < n; i++) {
+            scanf("%d", &a[i].v);
+            a[i].i = i;
+        }
+        sort(a, a + n);
+        memset(op, 0, sizeof(op));
+        long long sum = 0;
+        for (int i = n - 1; i >= 0; i--) {
+            if (sum >= 0) sum -= a[i].v;
+            else { sum += a[i].v; op[a[i].i] = 1;}
+        }
+        if (sum == 0) {
+            printf("Yes\n");
+            if (!op[0]) putchar('-');
+            printf("1");
+            for (int i = 1; i < n; i++) {
+                putchar(' ');
+                if (!op[i]) putchar('-');
+                putchar('1');
+            }
+        }
+        else printf("No");
+        putchar('\n');
+    }
+    return 0;
+}

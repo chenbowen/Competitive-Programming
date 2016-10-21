@@ -1,0 +1,86 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<cmath>
+#include<vector>
+#include<algorithm>
+
+using namespace std;
+const int maxn = 1000 + 10;
+int px[maxn], py[maxn], q, n, c[10];
+int uf[maxn];
+vector<int> subnet[10];
+
+struct Edge {
+    int u, v, w;
+    Edge(int u = 0, int v = 0, double w = 0): u(u), v(v), w(w) {};
+    bool operator < (const Edge &rhs) const{
+        return w < rhs.w;
+    }
+};
+vector<Edge> G, MST;
+
+void init_uf() { for (int i = 0; i < n; i++) uf[i] = i; }
+
+int Find(int x) { return uf[x] == x ? x : uf[x] = Find(uf[x]); }
+
+bool UNION(int u, int v, int cost, int &sum, int &cnt) {
+    int x = Find(u), y = Find(v);
+    if (x != y) {
+        uf[x] = y;
+        sum += cost;
+        cnt++;
+        return true;
+    }
+    return false;
+}
+
+int kruskal(int cnt, vector<Edge> &edges, bool first) {
+    int sum = 0;
+    for (int i = 0; i < edges.size() && cnt < n - 1; i++) 
+        if (UNION(edges[i].u, edges[i].v, edges[i].w, sum, cnt)) 
+            if (first) MST.push_back(Edge(edges[i].u, edges[i].v, edges[i].w));
+    return sum;
+}
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while(T--) {
+        G.clear();
+        scanf("%d%d", &n, &q);
+        for (int i = 0; i < q; i++) {
+            subnet[i].clear();
+            int m, t;
+            scanf("%d%d", &m, &c[i]);
+            for (int j = 0; j < m; j++) {
+                scanf("%d", &t);
+                subnet[i].push_back(t - 1);
+            }
+        }
+        for (int i = 0; i < n; i++) 
+            scanf("%d%d", &px[i], &py[i]);
+        for (int i = 0; i < n; i++)
+            for (int j = i + 1; j < n; j++) 
+                G.push_back(Edge(i, j, (px[i] - px[j]) * (px[i] - px[j]) + (py[i] - py[j]) * (py[i] - py[j])));
+        sort(G.begin(), G.end());
+        init_uf();
+        MST.clear();
+        int ans = kruskal(0, G, true);
+        
+        int upper = 1<<q;
+        for (int i = 0; i < upper; i++) {
+            int cnt = 0, temp = 0;
+            init_uf();
+            for (int j = 0; j < q; j++) if (i & (1<<j)) {
+                temp += c[j];
+                for (int k = 1; k < subnet[j].size(); k++) 
+                    UNION(subnet[j][0], subnet[j][k], 0, temp, cnt);
+            }
+            ans = min(ans, temp + kruskal(cnt, MST, false));
+        }
+        printf("%d\n", ans);
+        if (T) printf("\n");
+    }
+    return 0;
+}

@@ -1,0 +1,50 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+const int maxn = 1e5 + 5;
+typedef long long LL;
+int n;
+
+struct Item {
+    LL g, p;
+    Item(LL g = 0, LL p = 0): g(g), p(p) {}
+    bool operator < (const Item &rhs) const {
+        return g < rhs.g || (g == rhs.g && p < rhs.p);
+    }
+};
+
+LL gcd(LL a, LL b) {
+    if (!b) return a;
+    return gcd(b, a % b);
+}
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while (T--) {
+        scanf("%d", &n);
+        LL a, ans = 0;
+        vector<Item> items;
+        for (int i = 1; i <= n; i++) {
+            scanf("%lld", &a);
+            items.push_back(Item(a, i));
+            for (int k = 0; k < items.size(); k++) 
+                items[k].g = gcd(items[k].g, a);
+            sort(items.begin(), items.end());
+            
+            vector<Item> new_item;
+            for (int k = 0; k < items.size(); k++) 
+                if (k == 0 || items[k].g != items[k - 1].g) {
+                    new_item.push_back(items[k]);
+                    ans = max(ans, items[k].g * (i - items[k].p + 1));
+                }
+            items = new_item;         
+        }
+        printf("%lld\n", ans);
+    }
+    
+    return 0;
+}
+

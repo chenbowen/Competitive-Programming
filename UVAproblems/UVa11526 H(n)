@@ -1,0 +1,28 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+typedef long long LL;
+
+LL H(int n){
+    LL res = 0;
+    for(LL i = 1; i <= n; i++){
+        int p = n / i;
+        int j = (n - i * p) / p;
+        i += j;
+        res += p * (j + 1);
+    }
+    return res;
+}
+
+int main() {
+    int n, T;
+    scanf("%d", &T);
+    while (T--) {
+        scanf("%d", &n);
+        printf("%lld\n", H(n));
+    }
+    
+    return 0;
+}

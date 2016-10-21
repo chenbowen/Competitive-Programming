@@ -1,0 +1,47 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<map>
+#include<algorithm>
+using namespace std;
+const int maxn = 50000;
+typedef long long LL;
+LL prime[maxn], n;
+int len;
+bool vis[maxn];
+
+int gcd(int a, int b) {
+    if (!b) return a;
+    return gcd(b, a % b);
+}
+
+void init() {
+    int m = sqrt(maxn + 0.5);
+    for (int i = 2; i <= m; i++) if (!vis[i]) 
+        for (int j = i * i; j < maxn; j += i) vis[j] = 1;
+    
+    for (int i = 2; i < maxn; i++) if (!vis[i]) prime[len++] = i;
+}
+
+int main() {
+    init();
+    while (scanf("%lld", &n) == 1 && n) {
+        int temp = abs(n), ans = 0;
+        for (int i = 0; i < len; i++) if (temp % prime[i] == 0) {
+            int cnt = 0;
+        
+            while (temp % prime[i] == 0) {
+                temp /= prime[i];
+                cnt++;
+            }
+            ans = gcd(cnt, ans);
+        }
+        if (temp > 1 || ans == 0) ans = 1;
+        if (n < 0)
+            while (ans % 2 == 0) {
+                ans /= 2;
+            }
+        printf("%d\n", ans);
+    }
+    return 0;
+}

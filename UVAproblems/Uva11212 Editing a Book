@@ -1,0 +1,68 @@
+#include <cstdio>
+#include <cstring>
+using namespace std;
+
+int n, idx, maxd, a[9];
+bool ok;
+
+void create(int start, int len, int k) {
+    int olda[9]; 
+    memcpy(olda, a, sizeof(a));
+    int z = 0, i = 0;
+    for (; z < k; z++) {
+        if (z >= start && z < start + len) { z += (len - 1); continue;}
+        a[i++] = olda[z];
+    }
+    for (z = 0; z < len; z++) a[i++] = olda[start + z];
+    for (z = k; z < n; z++) {
+        if (z >= start && z < start + len) { z += (len - 1); continue;}
+        a[i++] = olda[z];
+    }
+}
+
+int num_unordered() {
+    int cnt = 0;
+    for (int i = 1; i < n; i++) if (a[i - 1] + 1 != a[i]) cnt++;
+    cnt = cnt ? cnt + 1 : 0;
+    return cnt;
+}
+
+bool success() {
+    for (int i = 0; i < n - 1; i++) if (a[i] + 1 != a[i + 1]) return false;
+    return true;
+}
+
+bool dfs(int d) {
+    if (d * 3 + num_unordered() > 3 * maxd) return false;
+    if (success()) { ok = 1; return true;}
+    int temp[9];
+    memcpy(temp, a, sizeof(a));
+    for (int i = 0; i < n; i++)
+        for (int j = i + 1; j <= n; j++) 
+            for (int k = 0; k <= n; k++) {
+                if (k >= i && k <= j) { k = j; continue;}
+                create(i, j - i, k);
+                if (dfs(d + 1)) return true;
+                memcpy(a, temp, sizeof(a));
+            }
+    return false;
+}
+
+int solve() {
+    if (success()) return 0;
+    ok = 0;
+    for (maxd = 1; maxd < 5; maxd++)
+        if (dfs(0)) return maxd;
+    return maxd;
+}
+
+int main() {
+    int T = 0;
+    while (scanf("%d", &n) == 1 && n) {
+        printf("Case %d: ", ++T);
+        for (int i = 0; i < n; i++) scanf("%d", &a[i]);
+        int ans = solve();
+        printf("%d\n", ans);
+    }
+    return 0;
+}

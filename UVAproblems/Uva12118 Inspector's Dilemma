@@ -1,0 +1,62 @@
+#include <cstdio>
+#include <vector>
+#include <cstdlib>
+#include <iostream>
+#include <set>
+#include <algorithm>
+#include <cstring>
+
+using namespace std;
+const int MAXN = 1000 + 5;
+int V, E, T, cnt, L[MAXN], g[MAXN], oddn[MAXN];
+vector<int> G[MAXN];
+set<int> e;
+bool f1[MAXN][MAXN], f[MAXN];
+
+void dfs(int v) {
+    f[v] = 1; g[v] = cnt;
+    int size = G[v].size();
+    for (int i = 0; i < size; i++)
+        if (!f1[v][G[v][i]]) { 
+            f1[v][G[v][i]] = f1[G[v][i]][v] = 1; 
+            L[cnt]++;
+            dfs(G[v][i]); 
+        }
+}
+
+int main() {
+    int t = 0;
+    while (scanf("%d%d%d", &V, &E, &T) == 3 && V) {
+        if (!E) { printf("Case %d: 0\n", ++t); continue;}
+        int a, b, ans = 0;
+        for (int i = 1; i <= V; i++) G[i].clear();
+        memset(f, 0, sizeof(f));
+        memset(f1, 0, sizeof(f1));
+        memset(oddn, 0, sizeof(oddn));
+        memset(g, 0, sizeof(g));
+        memset(L, 0, sizeof(L));
+        cnt = 0; e.clear();
+        for (int i = 0; i < E; i++) {
+            scanf("%d%d", &a, &b);
+            G[a].push_back(b); G[b].push_back(a);
+            e.insert(a); e.insert(b);
+        }
+        for (auto it: e) if (!f[it]) { dfs(it); cnt++; }
+        for (int i = 0; i < cnt; i++) ans += L[i];
+        ans += cnt - 1;
+        for (auto it: e) if (G[it].size() % 2) oddn[g[it]]++;
+        sort(oddn, oddn + cnt);
+        int sum_even = 0;
+        for (int i = 0; i < cnt - 1; i++) {
+            if (!oddn[i]) oddn[i] = 1;
+            else oddn[i]--;
+            if (!oddn[i + 1]) oddn[i + 1] = 1;
+            else oddn[i + 1]--;
+            sum_even += oddn[i];
+        }
+        sum_even += oddn[cnt - 1];
+        if (sum_even) ans += (sum_even - 2) / 2;
+        printf("Case %d: %d\n", ++t, ans * T);
+    }
+    return 0;
+}

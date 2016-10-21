@@ -1,0 +1,90 @@
+#include <iostream>
+#include <cstdio>
+#include <map>
+#include <vector>
+#include <queue>
+#include <set>
+#include <cstring>
+#include <climits>
+using namespace std;
+
+const int MAXN = 100000 + 10;
+map<int, set<int> > G;
+map<pair<int, int>, int> c;
+vector<int> sp;
+bool f[MAXN];
+int depth[MAXN], n, m, len;
+
+void link(int v1, int v2, int color) {
+    if (!G.count(v1)) G[v1] = set<int>();
+    if (!G.count(v2)) G[v2] = set<int>();
+    G[v1].insert(v2);
+    G[v2].insert(v1);
+    pair<int, int> e1(v1, v2), e2(v2, v1);
+    if (!c[e1]) c[e1] = c[e2] = INT_MAX;
+    c[e1] = c[e2] = min(c[e1], color);
+}
+
+void solve(int startv) {
+    queue<pair<int, int> > b;
+    b.push(make_pair(startv, 0)); f[startv] = 1;
+    pair<int, int> cur;
+    while (!b.empty()) {
+        cur = b.front(); b.pop();
+        depth[cur.first] = cur.second;
+        for (auto nextn: G[cur.first]) {
+            if (!f[nextn]) {
+                b.push(make_pair(nextn, cur.second + 1));
+                f[nextn] = 1;
+            }
+        }
+    }
+    memset(f, 0, sizeof(f));
+    len = depth[1]; 
+    vector<int> fro; fro.push_back(1);
+    for (int i = 0; i < len; i++) {
+        int minc_l = INT_MAX;
+        for (auto curr: fro) {
+            for (auto nextn: G[curr]) {
+                if (!f[nextn] && depth[curr] - 1 == depth[nextn]) {
+                    pair<int, int> e(curr, nextn);
+                    if (minc_l > c[e]) minc_l = c[e]; 
+                }
+            }
+        }
+        sp.push_back(minc_l);
+        vector<int> to;
+        for (auto curr: fro) {
+            for (auto nextn: G[curr]) {
+                if (!f[nextn] && depth[curr] - 1 == depth[nextn]) {
+                    pair<int, int> e(curr, nextn);
+                    if (minc_l == c[e]) {
+                        to.push_back(nextn);
+                        f[nextn] = 1; 
+                    }
+                }
+            }
+        }
+        fro = to;
+    }
+    printf("%d\n%d", len, sp[0]);
+    for (int i = 1; i < len; i++) printf(" %d", sp[i]);
+    printf("\n");
+}
+
+int main() {
+    freopen("in", "r", stdin);
+    //freopen("out", "w", stdout);
+    while (scanf("%d%d", &n, &m) == 2) {
+        G.clear(); c.clear(); sp.clear();
+        memset(f, 0, sizeof(f));
+        memset(depth, 0, sizeof(depth));
+        int a, b, c;
+        while (m--) {
+            scanf("%d%d%d", &a, &b, &c);
+            link(a, b, c);
+        }
+        solve(n);
+    }
+    return 0;
+}

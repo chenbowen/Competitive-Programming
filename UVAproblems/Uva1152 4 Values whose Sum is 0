@@ -1,0 +1,52 @@
+#include <cstdio>
+#include <cstring>
+#include <utility>
+using namespace std;
+const int MAXN = 4000 + 5, HASHSIZE = 7000003, MAXNUM = (1<<28) + 5;
+int n, a[MAXN], b[MAXN], c[MAXN], d[MAXN], idx;
+int _head[HASHSIZE], _next[MAXN*MAXN], ans;
+pair<int, int> my_map[MAXN*MAXN];
+
+void _insert(int num) {
+    int temp = num;
+    if (num < 0) { num *= -1, num +=  MAXNUM;}
+    int h = num % HASHSIZE;
+    int u = _head[h];
+    while (u) {
+        if (my_map[u].first == temp) { my_map[u].second++; return;}
+        u = _next[u];
+    }
+    my_map[++idx] = make_pair(temp, 1);
+    _next[idx] = _head[h];
+    _head[h] = idx;
+}
+
+void _find(int num) {
+    int temp = num;
+    if (num < 0) { num *= -1, num +=  MAXNUM;}
+    int h = num % HASHSIZE;
+    int u = _head[h];
+    while (u) {
+        if (my_map[u].first == temp) {ans += my_map[u].second; return;}
+        u = _next[u];
+    }
+}
+
+
+int main() {
+    int T, t = 0;
+    scanf("%d", &T);
+    while (T--) {
+        scanf("%d", &n);
+        if (++t > 1) putchar('\n');
+        ans = idx = 0;
+        for (int i = 0; i < n; i++) scanf("%d%d%d%d", &a[i], &b[i], &c[i], &d[i]);
+        memset(_head, 0, sizeof(_head));
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++) _insert(a[i] + b[j]);
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++) _find(-c[i]-d[j]);
+        printf("%d\n", ans);
+    }
+    return 0;
+}

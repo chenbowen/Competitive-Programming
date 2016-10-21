@@ -1,0 +1,95 @@
+#include <iostream>
+#include <cstdio>
+#include <cstdlib>
+#include <utility>
+#include <cstring>
+#include <sstream>
+
+using namespace std;
+const int MAXR = 20 + 2, MAXC = 10 + 2;
+string sheet[MAXR][MAXC];
+int r, c;
+bool hasCircle[MAXR][MAXC], f[MAXR][MAXC], ok;
+
+bool isNumber(int x, int y) {
+    string s = sheet[x][y];
+    int l = s.size();
+    if (isalpha(s[0])) return false;
+    for (int i = 0; i < l; i++) {
+        if (i != 0 && !isdigit(s[i])) return false;
+    }
+    return true;
+}
+
+void dfs(int x, int y) {
+    if (hasCircle[x][y] || isNumber(x, y)) return;
+    if (f[x][y]) {hasCircle[x][y] = 1; return; }
+    f[x][y] = 1;
+    string s = sheet[x][y];
+    char sign; int ans = 0, right, len = sheet[x][y].size(), i = 0;
+    while (i < len) {
+        sign = '+';
+        if (s[i] == '-' || s[i] == '+') {
+            sign = s[i];
+            i++;
+        }
+        if (isalpha(s[i])) {
+            int nx = s[i] - 'A', ny = s[i + 1] - '0';
+            i += 2;
+            dfs(nx, ny);
+            if (hasCircle[nx][ny]) {
+                hasCircle[x][y] = 1;
+                return;
+            }
+            right = stoi(sheet[nx][ny]);
+        }
+        else {
+            int j = i + 1;
+            while (j < len && isdigit(s[j])) j++;
+            right = stoi(s.substr(i, j - i));
+            i = j;
+        }
+        ans += right * ((sign == '+') ? 1 : -1);
+    }
+    stringstream ss; ss << ans;
+    ss >> sheet[x][y];
+}
+
+int main() {
+    while (scanf("%d%d", &r, &c) == 2 && r) {
+        memset(f, 0, sizeof(f));
+        memset(hasCircle, 0, sizeof(hasCircle));
+        ok = 1;
+        for (int i = 0; i < r; i++)
+            for (int j = 0; j < c; j++) 
+                cin >> sheet[i][j];
+            
+        for (int i = 0; i < r; i++)
+            for (int j = 0; j < c; j++) {
+                if (!f[i][j])
+                    dfs(i, j);
+                if (hasCircle[i][j]) ok = 0;
+            }
+        if (!ok) {
+            for (int i = 0; i < r; i++)
+                for (int j = 0; j < c; j++)
+                    if (hasCircle[i][j]) cout << char(i + 'A') << j << ": " << sheet[i][j] << endl;
+        }
+        else {
+            putchar(' ');
+            for (int i = 0; i < c; i++) printf("     %d", i);
+            putchar('\n');
+            for (int i = 0; i < r; i++) {
+                printf("%c", i + 'A');
+                for (int j = 0; j < c; j++) {
+                    for (int k = 0; k < 6 - sheet[i][j].size(); k++) putchar(' ');
+                    cout << sheet[i][j];
+                }
+                putchar('\n');
+            }
+        }
+        putchar('\n');
+    }
+    
+    return 0;
+}

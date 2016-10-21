@@ -1,0 +1,30 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+const int maxn = 10000001, MOD = 100000007;
+typedef long long LL;
+int n, m;
+LL phifac[maxn];
+bool vis[maxn];
+
+void init() {
+    int upper = sqrt(maxn + 0.5);
+    for (int i = 2; i <= upper; i++) if (!vis[i]) 
+        for (int j = i * i; j < maxn; j += i) vis[j] = 1;
+}
+
+int main() {
+    init();
+    phifac[1] = phifac[2] = 1;
+    for (int i = 3; i < maxn; i++) 
+        phifac[i] = phifac[i-1] * (vis[i] ? i : i-1) % MOD;
+    
+    while (scanf("%d%d", &n, &m) == 2 && n) {        
+        LL ans = phifac[m];
+        for (int i = m + 1; i <= n; i++) ans = ans * i % MOD;
+        printf("%lld\n", (ans - 1 + MOD) % MOD);
+    }
+    return 0;
+}

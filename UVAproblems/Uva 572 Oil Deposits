@@ -1,0 +1,29 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int MAXN = 100 + 10;
+
+char land[MAXN][MAXN];
+bool f[MAXN][MAXN];
+int dx[] = {0, -1, -1, -1, 0, 1, 1, 1}, dy[] = {1, 1, 0, -1, -1, -1, 0, 1}, cnt, m, n;
+void dfs(int x, int y) {
+    f[x][y] = 0;
+    for (int i = 0; i < 8; i++) {
+        int nx = x + dx[i], ny = y + dy[i];
+        if (nx >= 0 && nx < m && ny >= 0 && ny < n && land[nx][ny] == '@' && f[nx][ny]) dfs(nx, ny);
+    }
+}
+
+int main() {
+    while (scanf("%d%d", &m, &n) == 2 && m) {
+        cnt = 0;
+        memset(f, 1, sizeof(f));
+        for (int i = 0; i < m; i++) scanf("%s", land[i]);
+        for (int i = 0; i < m; i++)
+            for (int j = 0; j < n; j++)
+                if (land[i][j] == '@' && f[i][j]) { dfs(i, j); cnt++;}
+        printf("%d\n", cnt);
+    }
+    return 0;
+}

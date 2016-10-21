@@ -1,0 +1,43 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <algorithm>
+#include <utility>
+#include <stack>
+#include <cctype>
+
+using namespace std;
+
+const int MAXN = 1010;
+
+int target[MAXN];
+
+int main() {
+    //freopen("in", "r", stdin);
+    //freopen("out", "w", stdout);
+           
+    int N;
+    while (scanf("%d", &N) && N) {
+        bool ok = 1;
+        while (1) {
+            int in;
+            stack<int> train;
+            memset(target, 0, sizeof(target));
+            for (int i = 0; i < N; i++) {
+                if (scanf("%d", &in) && !i && !in) { printf("\n"); ok = 0; break;}
+                target[i] = in;
+            }
+            if (!ok) break;
+            int i = 1, j = 0;
+            while (j < N) {
+                if (train.empty()) train.push(i++);
+                if (train.top() == target[j]) { train.pop(); j++; }
+                else if (i <= N) train.push(i++);
+                else break;
+            }
+            if (j == N) printf("Yes\n");
+            else printf("No\n");
+        }
+    }
+    return 0;
+}

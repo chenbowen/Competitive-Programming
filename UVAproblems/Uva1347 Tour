@@ -1,0 +1,36 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <cfloat>
+#include <cmath>
+using namespace std;
+const int MAXN = 1000 + 10;
+int n;
+double d[MAXN][MAXN];
+
+struct Node {
+    int x, y;
+    Node (int x = 0, int y = 0): x(x), y(y) {}
+}a[MAXN];
+
+double dis(Node &n1, Node &n2) {
+    return sqrt((n1.x - n2.x) * (n1.x - n2.x) + (n1.y - n2.y) * (n1.y - n2.y));
+}
+
+int main() {
+    while (scanf("%d", &n) == 1 && n) {
+        for (int i = 0; i < n; i++) scanf("%d%d", &a[i].x, &a[i].y);
+        for (int i = 0; i < n; i++) d[n - 1][i] = dis(a[i], a[n - 1]);
+        for (int i = n - 2; i > 0; i--) {
+            double dis1 = dis(a[i], a[i + 1]);
+            for (int j = 0; j < i; j++) {
+                d[i][j] = DBL_MAX;
+                d[i][j] = min(d[i + 1][j] + dis1, d[i][j]);
+                d[i][j] = min(d[i + 1][i] + dis(a[j], a[i + 1]), d[i][j]);
+            }
+        }
+        d[0][0] = d[1][0] + dis(a[0], a[1]);
+        printf("%.2f\n", d[0][0]);
+    }
+    return 0;
+}

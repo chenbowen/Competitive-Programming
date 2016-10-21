@@ -1,0 +1,27 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cmath>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+const int maxn = 20 + 1;
+typedef long long LL;
+LL f[maxn][maxn][maxn];
+
+int main() {
+    f[1][1][1] = 1;
+    for (int i = 2; i < maxn; i++) 
+        for (int l = 1; l <= i; l++) 
+            for (int r = 1; r <= i; r++)  
+                f[i][l][r] = f[i - 1][l - 1][r] + f[i - 1][l][r - 1] + f[i - 1][l][r] * (i - 2);
+
+    int T;
+    scanf("%d", &T);
+    while (T--) {
+        int n, l, r;
+        scanf("%d%d%d", &n, &l, &r);
+        printf("%lld\n", f[n][l][r]);
+    }
+    
+    return 0;
+}

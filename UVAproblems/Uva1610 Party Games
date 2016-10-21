@@ -1,0 +1,36 @@
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+#include <algorithm>
+using namespace std;
+const int MAXN = 1000 + 5;
+string names[MAXN];
+string ml, mr;
+int n;
+
+int main() {
+    while (scanf("%d", &n) == 1 && n) {
+        for (int i = 0; i < n; i++) cin >> names[i];
+        sort(names, names + n);
+        ml = names[n / 2 - 1], mr = names[n / 2];
+        string middle;
+        int i = 0, l1 = ml.size(), l2 = mr.size();
+        while (i < min(l1, l2) && ml[i] == mr[i]) middle.push_back(ml[i++]);
+        if (i != l1) {
+            bool ok = 0;
+            for (int j = ml[i]; j <= mr[i]; j++) {
+                middle.push_back(j);
+                if (middle >= ml && middle < mr) {ok = 1; break;}
+                middle.pop_back();
+            }
+            if (!ok) {
+                middle.push_back(ml[i]);
+                while (++i < l1 && ml[i] == 'Z') middle.push_back('Z');
+                if (i == l1 - 1) middle.push_back(ml[i]);
+                else if (i < l1 - 1) middle.push_back(ml[i] + 1);
+            }
+        }
+        cout << middle << endl;
+    }
+    return 0;
+}

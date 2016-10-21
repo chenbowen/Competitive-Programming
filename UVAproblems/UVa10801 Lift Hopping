@@ -1,0 +1,111 @@
+#include<cstdio>
+#include<cstring>
+#include<queue>
+#include<iostream>
+#include<algorithm>
+#include<sstream>
+#include<vector>
+
+using namespace std;
+const int maxn = 500 + 10, INF = 1000000000;
+typedef long long LL;
+int n, m, k, a[maxn], p[maxn], d[maxn], T[maxn], idx, tot;
+bool inq[maxn];
+
+struct Edge {
+    int u, v, cap, flow, w;
+    Edge(int u = 0, int v = 0, int cap = 0, int w = 0, int flow = 0): u(u), v(v), cap(cap), w(w), flow(flow) {}
+};
+vector<Edge> edges;
+vector<int> G[maxn];
+vector<int> tk[maxn];
+
+bool MaxFlow(int s, int t, int &flow, LL &cost) {
+    for (int i = 0; i < maxn; i++) d[i] = INF;
+    memset(a, 0, sizeof(a));
+    memset(inq, 0, sizeof(inq));
+    queue<int> q;
+    q.push(s);
+    a[s] = INF; p[s] = 0; d[s] = 0;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        inq[u] = false;
+        for (int i = 0; i < G[u].size(); i++) {
+            Edge &e = edges[G[u][i]];
+            if (e.cap > e.flow && d[e.v] > d[u] + e.w) {
+                a[e.v] = min(e.cap - e.flow, a[u]);
+                p[e.v] = G[u][i];
+                d[e.v] = d[u] + e.w;
+                if (!inq[e.v]) {q.push(e.v); inq[e.v] = true;}
+            }
+        }
+    }
+    if (d[t] == INF) return false;
+    flow += a[t];
+    cost += LL(a[t]) * d[t];
+    for (int u = t; u != s; u = edges[p[u]].u) {
+        edges[p[u]].flow += a[t];
+        edges[p[u]^1].flow -= a[t];
+    }
+    return true;
+}
+
+
+LL MincostMaxFlow(int s, int t) {
+    int flow = 0;
+    LL cost = 0;
+    while (MaxFlow(s, t, flow, cost));
+    if (flow == 0 && k) return -1;
+    return cost;
+}
+
+void addEdge(int u, int v, int cap, int w) {
+    edges.push_back(Edge(u, v, cap, w));
+    edges.push_back(Edge(v, u, 0, -w));
+    G[u].push_back(edges.size() - 2);
+    G[v].push_back(edges.size() - 1);
+}
+
+void init() {
+    edges.clear();
+    idx = tot = 0;
+    for (int i = 0; i < maxn; i++) { G[i].clear(); tk[i].clear();}
+}
+
+int main() {
+    while (cin >> n >> k) {
+        init();
+        for (int i = 0; i < n; i++) cin >> T[i];
+        getchar();
+        string s;
+        for (int i = 0; i < n; i++) {
+            getline(cin, s);
+            stringstream ss(s);
+            int tt;
+            while (ss >> tt) {
+                tk[i].push_back(tt);
+                tot++;
+            }
+        }
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < tk[i].size(); idx++, j++) {
+                if (tk[i][j] == 0) addEdge(tot, idx, 1, 0);
+                else if (tk[i][j] == k) addEdge(idx, tot+1, 1, 0);
+                if (j > 0) {
+                    addEdge(idx-1, idx, 1, T[i]*(tk[i][j] - tk[i][j-1]));
+                    addEdge(idx, idx-1, 1, T[i]*(tk[i][j] - tk[i][j-1]));
+                }
+                int idx2 = 0;
+                for (int ii = 0; ii < n; ii++) 
+                    for (int jj = 0; jj < tk[ii].size(); idx2++, jj++) 
+                        if (idx != idx2 && tk[i][j] == tk[ii][jj]){
+                            addEdge(idx, idx2, 1, 60);
+                            addEdge(idx2, idx, 1, 60);
+                        }
+            }
+        LL ans = MincostMaxFlow(tot, tot+1);
+        if (ans == -1) cout << "IMPOSSIBLE\n";
+        else cout << ans << endl;
+    }
+    return 0;
+}

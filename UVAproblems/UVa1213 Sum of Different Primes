@@ -1,0 +1,29 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+const int maxn = 1120 + 2;
+int prime[maxn], cnt, n, k, d[maxn][15];
+bool vis[maxn];
+
+void init() {
+    int m = sqrt(maxn + 0.5);
+    for (int i = 2; i <= m; i++) if (!vis[i]) 
+        for (int j = i * i; j < maxn; j += i) vis[j] = 1;
+    for (int i = 2; i < maxn; i++) if (!vis[i]) prime[cnt++] = i;
+    
+    d[0][0] = 1;
+    for (int i = 0; i < cnt; i++)
+        for (int j = 14; j > 0; j--)
+            for (int k2 = maxn; k2 >= prime[i]; k2--) 
+                d[k2][j] += d[k2 - prime[i]][j - 1];
+}
+
+int main() {
+    init();
+    while (scanf("%d%d", &n, &k) == 2 && n) {
+        printf("%d\n", d[n][k]);
+    }
+    return 0;
+}

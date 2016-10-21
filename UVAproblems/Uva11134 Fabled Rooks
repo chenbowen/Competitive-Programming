@@ -1,0 +1,49 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int MAXN = 5000 + 5;
+int ansx[MAXN], ansy[MAXN], n;
+bool f[MAXN];
+
+struct Range {
+    int i, s, e;
+    Range(int i = 0, int s = 0, int e = 0): i(i), s(s), e(e) {}
+    bool operator < (const Range &rhs) const {
+        return e < rhs.e || (e == rhs.e && s < rhs.s);
+    }
+}X[MAXN], Y[MAXN];
+
+bool solve(Range *intev, int *ans) {
+    memset(f, 0, sizeof(f));
+    for (int i = 1; i <= n; i++) {
+        bool ok = 0;
+        for (int j = 0; j < n; j++) {
+            if (!f[j] && i >= intev[j].s && i <= intev[j].e) {
+                f[j] = 1;
+                ans[intev[j].i] = i;
+                ok = 1;
+                break;
+            }
+        }
+        if (!ok) return false;
+    }
+    return true;
+}
+
+int main() {
+    while (scanf("%d", &n) == 1 && n) {
+        for (int i = 0; i < n; i++) {
+            X[i] = Range(i);
+            Y[i] = Range(i);
+            scanf("%d%d%d%d", &X[i].s, &Y[i].s, &X[i].e, &Y[i].e);
+        }
+        sort(X, X + n);
+        sort(Y, Y + n);
+        if (solve(X, ansx) && solve(Y, ansy)) 
+            for (int i = 0; i < n; i++) printf("%d %d\n", ansx[i], ansy[i]);
+        else 
+            printf("IMPOSSIBLE\n");
+    }
+    return 0;
+}

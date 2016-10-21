@@ -1,0 +1,26 @@
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+const int MAXN = 50 + 4, inf = 2000000000;
+int d[MAXN][MAXN], n, l, p[MAXN];
+
+int main() {
+    while (scanf("%d", &l) == 1 && l) {
+        scanf("%d", &n);
+        for (int i = 1; i <= n; i++) scanf("%d", &p[i]);
+        p[++n] = l;
+        for (int L = 2; L <= n; L++) {
+            for (int i = 0; i + L <= n; i++) {
+                int j = i + L;
+                if (L == 2) { d[i][j] = p[j] - p[i]; continue; }
+                d[i][j] = inf;
+                for (int k = i + 1; k < j; k++) 
+                    d[i][j] = min(d[i][j], d[i][k] + d[k][j]);
+                d[i][j] += p[j] - p[i];
+            }
+        }
+        printf("The minimum cutting is %d.\n", d[0][n]);
+    }
+    return 0;
+}

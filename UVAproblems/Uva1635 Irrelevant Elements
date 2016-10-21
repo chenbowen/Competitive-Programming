@@ -1,0 +1,54 @@
+#include<cstdlib>
+#include<cstdio>
+#include<iostream>
+#include<cstring>
+#include<cmath>
+#include<vector>
+#include<algorithm>
+using namespace std;
+const int maxn = 100000 + 5;
+int n, m, ans[maxn];
+bool bad[maxn];
+vector<int> prime;
+
+int main() {
+    while (scanf("%d%d", &n, &m) == 2) {       
+        int cnt = 0;
+        prime.clear();
+        n--;
+        int mm = floor(sqrt(m + 0.5)), t_m = m;
+        for (int i = 2; i <= mm; i++) {
+            if (t_m % i) continue;
+            prime.push_back(i);
+            while (t_m % i == 0) {
+                t_m /= i;
+            }
+        }
+        if (t_m > 1) prime.push_back(t_m);
+        memset(bad, 0, sizeof(bad));
+        for (auto p: prime) {
+            int min_e = 0, e = 0;
+            t_m = m;
+            while (t_m % p == 0) {
+                t_m /= p;
+                min_e++;
+            }
+            for (int k = 1; k <= n; k++) {
+                int temp = k;
+                while (temp % p == 0) { e--; temp /= p;}
+                temp = n - k + 1;
+                while (temp % p == 0) { e++; temp /= p;}
+                if (e < min_e) bad[k] = 1;
+            }
+            
+        }
+        for (int k = 1; k <= n; k++) if (!bad[k]) ans[cnt++] = k + 1;
+        
+        printf("%d\n", cnt);
+        if (cnt != 0) printf("%d", ans[0]);
+        for (int i = 1; i < cnt; i++) 
+            printf(" %d", ans[i]);
+        putchar('\n');
+    }
+    return 0;
+}

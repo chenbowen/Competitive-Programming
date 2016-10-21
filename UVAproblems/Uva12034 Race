@@ -1,0 +1,33 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cmath>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+const int maxn = 1000 + 3, MOD = 10056;
+int f[maxn], c[maxn][maxn];
+
+void init() {
+    for (int i = 1; i < maxn; i++) {
+        c[i][0] = c[i][i] = 1;
+        for (int j = 1; j < i; j++) 
+            c[i][j] = (c[i - 1][j - 1] + c[i - 1][j]) % MOD;
+    }
+}
+
+int main() {
+    init();
+    f[1] = f[0] = 1; f[2] = 3;
+    for (int i = 3; i < maxn; i++) 
+        for (int j = 1; j <= i; j++) 
+            f[i] = (f[i] + c[i][j] * f[i - j]) % MOD;
+    
+    int T, kase = 0;
+    scanf("%d", &T);
+    while (T--) {
+        int n;
+        scanf("%d", &n);
+        printf("Case %d: %d\n", ++kase,  f[n] % MOD);
+    }
+    return 0;
+}

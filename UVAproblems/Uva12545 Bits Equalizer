@@ -1,0 +1,41 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+using namespace std;
+const int MAXN = 200 + 10;
+char s[MAXN], t[MAXN];
+
+int main() {
+    int T, kase = 0;
+    scanf("%d", &T);
+    while (T--) {
+        scanf("%s", s);
+        scanf("%s", t);
+        int n = strlen(s), t1, s1, q, t0, s0, ans = -1;
+        t1 = s1 = q = 0;
+        int wrong_place1 = 0, wrong_place0 = 0;
+        for (int i = 0; i < n; i++) {
+            if (s[i] == '?') q++;
+            else if (s[i] == '1') s1++;
+            if (t[i] == '1') t1++;
+            if (s[i] != t[i]) {
+                if (s[i] == '1') wrong_place1++;
+                if (s[i] == '0') wrong_place0++;
+            }
+        }
+        t0 = n - t1; s0 = n - s1 - q;
+        if (s1 <= t1) {
+            ans = 0;
+            if (s0 > t0) {
+                ans += s0 - t0;
+                if (ans > wrong_place0) wrong_place1 += ans - wrong_place0;
+                wrong_place0 -= min(wrong_place0, ans);
+            }
+            ans += q + max(wrong_place1, wrong_place0);
+        }
+        printf("Case %d: %d\n", ++kase, ans);
+    }
+    return 0;
+}

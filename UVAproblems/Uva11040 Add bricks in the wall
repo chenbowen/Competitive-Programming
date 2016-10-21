@@ -1,0 +1,35 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+const int maxn = 11;
+int a[maxn][maxn];
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while (T--) {
+        for (int i = 1; i <= 9; i += 2)
+            for (int j = 1; j <= i; j += 2) 
+                scanf("%d", &a[i][j]);
+        
+        for (int i = 1; i <= 7; i += 2)
+            for (int j = 1; j <= i; j += 2) {
+                int x = (a[i][j] + a[i + 2][j] - a[i + 2][j + 2]) / 2;
+                int y = a[i][j] - x;
+                int z = x - a[i + 2][j];
+                a[i + 1][j] = x;
+                a[i + 1][j + 1] = y;
+                a[i + 2][j + 1] = z;
+            }
+        
+        for (int i = 1; i <= 9; i++) {
+            printf("%d", a[i][1]);
+            for (int j = 2; j <= i; j++) 
+                printf(" %d", a[i][j]);
+            printf("\n");
+        }
+    }
+    return 0;
+}

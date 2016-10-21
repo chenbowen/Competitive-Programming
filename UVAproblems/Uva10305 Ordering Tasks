@@ -1,0 +1,44 @@
+#include <iostream>
+#include <cstdio>
+#include <vector>
+#include <map>
+#include <functional>
+#include <cstring>
+
+using namespace std;
+
+const int MAXN = 100 + 10;
+int m, n, Index;
+bool f[MAXN];
+map<int, vector<int> > node;
+map<int, int, greater<int> > topo;
+
+void topodfs(int vertex) {
+    if (node.count(vertex)) {
+        int l = node[vertex].size();
+        for (int i = 0; i < l; i++) 
+            if (!f[node[vertex][i]]) topodfs(node[vertex][i]);
+    }
+    f[vertex] = 1; topo[++Index] = vertex;
+}
+
+int main() {
+    freopen("in", "r", stdin);
+    //freopen("out", "w", stdout);
+    
+    while (scanf("%d%d", &n, &m) == 2 && n) {
+        node.clear(); topo.clear();
+        memset(f, 0, sizeof(f));
+        int From, To; Index = 0;
+        for (int i = 0; i < m; i++) {
+            scanf("%d%d", &From, &To);
+            if (!node.count(From)) node[From] = vector<int>();
+            node[From].push_back(To);
+        }
+        for (int i = 1; i <= n; i++)
+            if (!f[i]) topodfs(i);
+        for (auto it: topo) printf("%d ", it.second);
+        printf("\n");
+    }
+    return 0;
+}

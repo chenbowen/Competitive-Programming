@@ -1,0 +1,86 @@
+#include <cstdio>
+#include <cstring>
+#include <utility>
+#include <set>
+#include <algorithm>
+#include <vector>
+using namespace std;
+
+const int MAXN = 200 + 10;
+bool pic[MAXN][MAXN], record[MAXN][MAXN];
+const char *name = "WAKJSD";
+int f[MAXN][MAXN], dx[] = {0, -1, 0, 1}, dy[] = {1, 0, -1, 0};
+int cnt, H, W, T;
+vector<pair<int, int> > startp;
+
+void init_read() {
+    char s[55]; cnt = 0; H += 2; int NW = 4 * W + 2;
+    memset(pic, 0, sizeof(pic));
+    memset(f, 0, sizeof(f));
+    memset(record, 0, sizeof(record));
+    startp.clear();
+    for (int i = 0; i < NW; i++) pic[0][i] = pic[H - 1][i] = 0;
+    for (int i = 0; i < H; i++) pic[i][0] = pic[i][NW - 1] = 0;
+    for (int i = 1; i < H - 1; i++) {
+        scanf("%s", s);
+        for (int j = 0; j < W; j++) {
+            int num = s[j] > '9' ? s[j] - 'a' + 10 : s[j] - '0';
+            for (int k = 0; k < 4; k++) 
+                if (num >= (1 << (3 - k))) { pic[i][j * 4 + k + 1] = 1; num -= (1 << (3 - k));}
+        }
+    }
+    W = NW;
+}
+
+void colorization(int x, int y, bool c) {
+    f[x][y] = cnt;
+    for (int i = 0; i < 4; i++) {
+        int nx = x + dx[i], ny = y + dy[i];
+        if (nx >= 0 && ny >= 0 && nx < H && ny < W && pic[nx][ny] == c && !f[nx][ny])
+            colorization(nx, ny, c); 
+    }
+}
+void floodfill() {
+    for (int i = 0; i < H; i++) 
+        for (int j = 0; j < W; j++) 
+            if (!f[i][j]) { 
+                cnt++; colorization(i, j, pic[i][j]); 
+                if (pic[i][j]) startp.push_back(make_pair(i, j)); 
+            }
+}
+
+void get_signiture(set<int> &signature, int x, int y) {
+    record[x][y] = 1;
+    for (int i = 0; i < 4; i++) {
+        int nx = x + dx[i], ny = y + dy[i];
+        if (nx >= 0 && ny >= 0 && nx < H && ny < W) {
+            if (f[nx][ny] != f[x][y]) signature.insert(f[nx][ny]);
+            else if(f[nx][ny] == f[x][y] && !record[nx][ny])
+                get_signiture(signature, nx, ny); 
+        }
+    }
+}
+void recognize() {
+    vector<char> ans;
+    int n = startp.size();
+    for (int i = 0; i < n; i++) {
+        int x = startp[i].first, y = startp[i].second;
+        set<int> signature;
+        get_signiture(signature, x, y);
+        ans.push_back(name[signature.size() - 1]);
+    }
+    sort(ans.begin(), ans.end());
+    printf("Case %d: ", ++T);
+    for (int i = 0; i < n; i++)
+        printf("%c", ans[i]);
+    printf("\n");
+}
+
+int main() {
+    while (scanf("%d%d", &H, &W) == 2 && H) {
+        init_read();
+        floodfill();
+        recognize();
+    }
+    return 0;
+}

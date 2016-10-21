@@ -1,0 +1,32 @@
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+using namespace std;
+char s[210];
+int l,nl;
+int compare(int x,int y){
+	for(int i = 0;i < l; i++)
+		if(s[i + x] < s[i + y])
+		   return x;
+		else if(s[i + x] > s[i + y])
+		   return y;
+	return y;
+}
+int main() {
+    int T,i,j,index;
+    scanf("%d",&T);
+    for(i = 0;i < T; i++){
+    	scanf("%s",s);
+    	index = 0;
+    	l = strlen(s);
+    	nl = 2 * l;
+    	for(j = l;j < nl; j++)  s[j] = s[j - l];
+    	for(j = 1;j < l; j++)
+    		index = compare(index,j);
+    	nl = index + l;
+    	for(j = index; j < nl; j++)
+    	    printf("%c",s[j]);
+    	printf("\n");
+    }
+	return 0;
+}

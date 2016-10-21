@@ -1,0 +1,28 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cmath>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+const int maxn = 100 + 5;
+int n;
+char s[maxn];
+
+int main() {
+    while (scanf("%s", s) == 1) {
+        n = strlen(s);
+        int cnt = 0;
+        double ans = 0;
+        for (int i = 0; i < n; i++) {
+            if (s[i] == '0') {
+                ans += (s[(i + 1) % n] == '0') ? 1.0 : 0.0;
+                cnt++;
+            }
+        }
+        ans /= double(cnt);
+        if (ans > double(cnt) / n) printf("SHOOT\n");
+        else if (ans < double(cnt) / n) printf("ROTATE\n");
+        else printf("EQUAL\n");
+    }
+    return 0;
+}

@@ -1,0 +1,19 @@
+#include <cstdio>
+#include <cstring>
+using namespace std;
+const int MAXN = 20000 + 10;
+int sol[MAXN];
+
+int main() {
+    int k;
+    while (scanf("%d", &k) == 1) {
+        memset(sol, 0, sizeof(sol));
+        int upper = 2 * k, n = 0;
+        for (int y = k + 1; y <= upper; y++) 
+            if (((y * k) % (y - k)) == 0) sol[n++] = y;
+        printf("%d\n", n);
+        for (int i = 0; i < n; i++) 
+            printf("1/%d = 1/%d + 1/%d\n", k, sol[i] * k / (sol[i] - k), sol[i]);
+    }
+    return 0;
+}

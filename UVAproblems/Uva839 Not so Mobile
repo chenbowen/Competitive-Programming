@@ -1,0 +1,29 @@
+/*
+  Pretty easy though looked difficult.
+*/
+#include <cstdio>
+using namespace std;
+
+int N, t;
+bool ok;
+int run() {
+    int Dl, Dr, Wl, Wr;
+    scanf("%d%d%d%d", &Wl, &Dl, &Wr, &Dr);
+    if (!Wl) Wl = run();
+    if (!Wr) Wr = run();
+    if (Dl * Wl != Dr * Wr) ok = 0;
+    return Wl + Wr;
+}
+
+int main() {
+    
+    scanf("%d", &N);
+    t = N;
+    while (t--) {
+        ok = 1;
+        run();
+        if (t != N - 1) printf("\n");
+        printf("%s\n", ok ? "YES" : "NO");
+    }
+    return 0;
+}

@@ -1,0 +1,43 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+const int maxn = 1e4 + 5;
+double dx[] = {-1, -1, 0, 1, 1, 0}, dy[] = {-0.5, 0.5, 1, 0.5, -0.5, -1};
+
+struct Point {
+    double x, y;
+    Point(double x = 0, double y = 0): x(x), y(y) {}
+}a[maxn];
+
+void init() {
+    int len = 0, cnt = 0, tot = 1;
+    double x = 0, y = 0;
+    for (int i = 1; i < maxn; i++) {
+        a[i] = Point(x, y);
+        if (++cnt == tot) {
+            ++len;
+            tot = len * 6;
+            cnt = 0;
+            y -= 1;
+        }
+        else {
+            x += dx[cnt / len];
+            y += dy[cnt / len];
+        }
+    }
+}
+
+int main() {
+    init();
+    int ina, inb;
+    while (scanf("%d%d", &ina, &inb) == 2 && ina) {
+        double ans = fabs(a[ina].x - a[inb].x);
+        double disy = fabs(a[ina].y - a[inb].y);
+        disy = max(0.0, disy - 0.5 * ans);
+        ans += disy;
+        printf("The distance between cells %d and %d is %d.\n", ina, inb, int(ans));
+    }
+    return 0;
+}

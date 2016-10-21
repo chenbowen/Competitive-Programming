@@ -1,0 +1,41 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <map>
+using namespace std;
+const int maxn = 200000 + 5;
+int n, L[maxn], R[maxn];
+
+bool Middle (int _s, int _e) {
+    if (_s >= _e - 1) return true;
+    int m = _s + (_e - _s - 1) / 2, j;
+    for (int i = _s; i <= m; i++) {
+        if (L[i] < _s && R[i] >= _e) return Middle(_s, i) && Middle(i + 1, _e);
+        j = _e - 1 - i + _s;
+        if (L[j] < _s && R[j] >= _e) return Middle(_s, j) && Middle(j + 1, _e);
+    }
+    return false;
+}
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while (T--) {
+        map<int, int> app;
+        scanf("%d", &n);
+        fill(L, L + n, -1);
+        fill(R, R + n, maxn);
+        int a;
+        for (int i = 0; i < n; i++) {
+            scanf("%d", &a);
+            if (app.count(a)) {
+                L[i] = app[a];
+                R[app[a]] = i;
+            }
+            app[a] = i;
+        }
+        if (Middle(0, n)) printf("non-boring\n");
+        else printf("boring\n");
+    }
+    return 0;
+}

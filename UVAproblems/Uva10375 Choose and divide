@@ -1,0 +1,68 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<cmath>
+#include<map>
+#include<algorithm>
+using namespace std;
+const int maxn = 10000 + 5;
+int p, q, r, s, cnt, prime[maxn], arr_lst2[2*maxn];
+bool is_prime[maxn];
+map<int, int> sep[maxn], lst1, lst2;
+
+void Merge(map<int, int> &lst, int num) {
+    map<int, int> &rhs = sep[num];
+    for (auto i: rhs) 
+        lst[i.first] += i.second;
+}
+
+void init() {
+    memset(is_prime, 1, sizeof(is_prime));
+    int m = sqrt(maxn + 0.5);
+    for (int i = 2; i <= m; i++) if (is_prime[i]) {
+        prime[cnt++] = i;
+        for (int j = i * i; j < maxn; j += i) is_prime[j] = 0;
+    }
+    
+    for (int i = 2; i < 10001; i++) {
+        if (is_prime[i]) {
+            sep[i][i]++;
+            continue;
+        }
+        for (int j = 0; j < cnt; j++) if (i % prime[j] == 0) {
+            map<int, int> comp = sep[i / prime[j]];
+            comp[prime[j]]++;
+            sep[i] = comp;
+            break;
+        }
+    }
+}
+
+int main() {
+    init();
+    while (scanf("%d%d%d%d", &p, &q, &r, &s) == 4) {
+        lst1.clear(); lst2.clear();
+        for (int i = q + 1; i <= p; i++) Merge(lst1, i);
+        for (int i = 2; i <= r - s; i++) Merge(lst1, i);
+        for (int i = 2; i <= p - q; i++) Merge(lst2, i);
+        for (int i = s + 1; i <= r; i++) Merge(lst2, i);
+        for (auto i: lst1) {
+            int t = min(i.second, lst2[i.first]);
+            lst1[i.first] -= t;
+            lst2[i.first] -= t;
+        }
+        int cnt_lst2 = 0;
+        for (auto i: lst2) if (i.second) 
+            for (int j = 0; j < i.second; j++) arr_lst2[cnt_lst2++] = i.first;
+        double ans = 1;
+        for (auto i: lst1) if (i.second) {
+            ans *= pow(i.first*1.0, i.second*1.0);
+            if (ans > 100000000) ans /= 1.0 * arr_lst2[--cnt_lst2];
+        }
+        while (cnt_lst2) {
+            ans /= arr_lst2[--cnt_lst2] * 1.0;      
+        }
+        printf("%.5f\n", ans);
+    }    
+    return 0;
+}

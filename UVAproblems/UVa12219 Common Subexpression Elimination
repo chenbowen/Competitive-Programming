@@ -1,0 +1,77 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<map>
+#include<algorithm>
+
+using namespace std;
+const int maxn = 60000 + 5;
+
+char s[5*maxn], *p;
+int nc, done[maxn], kase, T;
+
+struct Node {
+    int hash, left, right;
+    string s;
+    bool operator < (const Node &rhs) const {
+        if (hash != rhs.hash) return hash < rhs.hash;
+        if (left != rhs.left) return left < rhs.left;
+        return right < rhs.right;
+    }
+}node[maxn];
+
+map<Node, int> set;
+
+int build_tree() {
+    int id = nc++;
+    Node &u = node[id];
+    u.hash = 0;
+    u.left = u.right = -1;
+    u.s = "";
+    while (isalpha(*p)) {
+        u.hash = u.hash * 27 + *p - 'a' + 1;
+        u.s.push_back(*p);
+        p++;
+    }
+    if (*p == '(') {
+        p++;
+        u.left = build_tree(); p++;
+        u.right = build_tree(); p++;
+    }
+    if (set.count(u) != 0) {
+        nc--;
+        return set[u];
+    }
+    return set[u] = id;
+}
+
+void print(int v) {
+    if (done[v] == kase) {
+        printf("%d", v + 1);
+    }
+    else {
+        Node &u = node[v];
+        done[v] = kase;
+        printf("%s", u.s.c_str());
+        if (u.left != -1) {
+            putchar('(');
+            print(u.left);
+            putchar(',');
+            print(u.right);
+            putchar(')');
+        }
+    }
+}
+
+int main() {
+    scanf("%d", &T);
+    for (kase = 1; kase <= T; kase++) {
+        nc = 0;
+        set.clear();
+        scanf("%s", s);
+        p = s;
+        print(build_tree());
+        putchar('\n');
+    }
+    return 0;
+}

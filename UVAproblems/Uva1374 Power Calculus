@@ -1,0 +1,36 @@
+#include <cstdio>
+#include <cstring>
+using namespace std;
+const int MAXD = 13;
+int n, f[1<<(MAXD - 1)], maxd, a[20];
+
+bool dfs(int d) {
+    if (a[d] == n) return true;
+    if (d < maxd && (a[d]<<(maxd - d)) >= n) {
+        for (int i = d; i >= 0; i--)
+            for (int j = 0; j < 2; j++) {
+            int nextn = j ? a[d] + a[i] : a[d] - a[d - i];
+            if (nextn <= 0 || f[nextn]) continue;
+            f[nextn] = 1;
+            if (nextn <= 0) continue;
+            a[d + 1] = nextn;
+            if (dfs(d + 1, nextn)) return true;
+            f[nextn] = 0;
+        }
+    }    
+    return false;
+}
+int main() {
+    a[0] = 1; 
+    while (scanf("%d", &n) == 1 && n) {
+        if (n == 1) { printf("0\n"); continue;}
+        for (maxd = 1; maxd < MAXD; maxd++) {
+            memset(f, 0, sizeof(f));
+            f[1] = 1;            
+            if (dfs(0)) break;
+        }
+        printf("%d\n", maxd);
+    }
+    return 0;
+}
+

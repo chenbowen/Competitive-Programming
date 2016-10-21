@@ -1,0 +1,57 @@
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+#include <queue>
+#include <utility>
+
+using namespace std;
+const int MAXN = 8 + 2;
+int sx, sy, tx, ty, d[MAXN][MAXN];
+int dx[] = {-1, -2, -2, -1, 1, 2, 2, 1}, dy[] = {2, 1, -1, -2, -2, -1, 1, 2};
+bool f[MAXN][MAXN];
+
+struct Node {
+    int x, y, dep;
+    Node(int x = 0, int y = 0,int d = 0): x(x), y(y), dep(d) {}
+};
+
+pair<int, int> trans(char s[3]) {
+    return make_pair(s[0] - 'a', s[1] - '1');
+}
+
+bool inside(int x, int y) {
+    return x >= 0 && y >= 0 && x < 8 && y < 8;
+}
+
+int bfs() {
+    queue<Node> q;
+    q.push(Node(sx, sy, 0)); 
+    f[sx][sy] = 1;
+    while (!q.empty()) {
+        Node cur = q.front(); q.pop();
+        if (cur.x == tx && cur.y == ty) break;
+        for (int i = 0; i < 8; i++) {
+            int nx = cur.x + dx[i], ny = cur.y + dy[i];
+            if (inside(nx, ny) && !f[nx][ny]) {
+                f[nx][ny] = 1;
+                d[nx][ny] = cur.dep + 1;
+                q.push(Node(nx, ny, cur.dep + 1));
+            }
+        }
+    }
+    return d[tx][ty];
+}
+
+int main() {
+    char p1[3], p2[3];
+    while (scanf("%s %s", p1, p2) == 2) {
+        memset(f, 0, sizeof(f));
+        memset(d, 0, sizeof(d));
+        pair<int, int> start = trans(p1), end = trans(p2);
+        sx = start.first; sy = start.second; 
+        tx = end.first; ty = end.second;
+        int ans = bfs();
+        printf("To get from %s to %s takes %d knight moves.\n", p1, p2, ans);
+    }
+    return 0;
+}

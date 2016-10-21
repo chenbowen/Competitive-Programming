@@ -1,0 +1,86 @@
+#include<cstdio>
+#include<cstring>
+#include<queue>
+#include<algorithm>
+#include<vector>
+
+using namespace std;
+const int INF = 100000000;
+const int maxn = 200 + 10;
+int n, a[maxn], p[maxn], inq[maxn], d[maxn];
+
+struct Edge {
+    int u, v, cap, flow, w;
+    Edge(int u = 0, int v = 0, int cap = 0, int w = 0, int flow = 0): u(u), v(v), cap(cap), w(w), flow(flow) {}
+};
+vector<Edge> edges;
+vector<int> G[maxn];
+
+void addEdge(int u, int v, int cap, int w) {
+    edges.push_back(Edge(u, v, cap, w));
+    edges.push_back(Edge(v, u, 0, -w));
+    G[u].push_back(edges.size() - 2);
+    G[v].push_back(edges.size() - 1);
+}
+
+void init() {
+    edges.clear();
+    for (int i = 0; i < maxn; i++) G[i].clear();
+}
+
+bool spfa(int s, int t, int &flow, int &cost) {
+    for (int i = 1; i <= 2*n+1; i++) d[i] = INF;
+    memset(inq, 0, sizeof(inq));
+    queue<int> q;
+    q.push(s);
+    d[s] = p[s] = 0; a[s] = INF;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        inq[u] = false;
+        for (int i = 0; i < G[u].size(); i++) {
+            Edge &e = edges[G[u][i]];
+            if (e.cap > e.flow && d[e.v] > d[u] + e.w) {
+                d[e.v] = d[u] + e.w;
+                p[e.v] = G[u][i];
+                a[e.v] = min(a[u], e.cap - e.flow);
+                if (!inq[e.v]) { q.push(e.v); inq[e.v] = true;}
+            }
+        }
+    }
+    if (d[t] == INF) return false;
+    flow += a[t];
+    cost += d[t];
+    for (int u = t; u != s; u = edges[p[u]].u) {
+        edges[p[u]].flow += a[t];
+        edges[p[u]^1].flow -= a[t];
+    }
+    return true;
+}
+
+int MincostMaxFlow(int s, int t) {
+    int flow = 0, cost = 0;
+    while (spfa(s, t, flow, cost));
+    if (flow == n) return cost;
+    return -1;
+}
+
+int main() {
+    while (scanf("%d", &n) == 1 && n) {
+        init();
+        for (int i = 1; i <= n; i++) {
+            int v, w;
+            while (scanf("%d", &v) && v) {
+                scanf("%d", &w);
+                addEdge(i, v + n, 1, w);
+            }
+        }
+        for (int i = 1; i <= n; i++) {
+            addEdge(0, i, 1, 0);
+            addEdge(i + n, n+n+1, 1, 0);
+        }
+        int ans = MincostMaxFlow(0, n+n+1);
+        if (ans != -1) printf("%d\n", ans);
+        else printf("N\n");
+    }
+    return 0;
+}

@@ -1,0 +1,19 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cmath>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+double a, b, c;
+
+int main() {
+    int ia, ib, ic;
+    while (scanf("%d%d%d", &ia, &ib, &ic) == 3) {
+        a = ia; b = ib; c = ic;
+        double ans = 0;
+        ans = b / (a + b) * (b - 1) / (a + b - c - 1);
+        ans += a / (a + b) * b / (a + b - c - 1);
+        printf("%.5f\n", ans);
+    }
+    return 0;
+}

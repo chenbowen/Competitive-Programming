@@ -1,0 +1,97 @@
+#include<cstdio>
+#include<cstring>
+#include<queue>
+#include<algorithm>
+#include<vector>
+
+using namespace std;
+const int maxn = 50 * 50 + 10, maxw = 50 + 5;
+const int INF = 1000000000;
+int d, f, b, w, h, a[maxn], p[maxn];
+int dx[] = {0, -1, 0, 1}, dy[] = {1, 0, -1, 0};
+char s[maxw][maxw];
+
+struct Edge {
+    int u, v, cap, flow;
+    Edge(int u = 0, int v = 0, int cap = 0, int flow = 0): u(u), v(v), cap(cap), flow(flow) {}
+};
+vector<Edge> edges;
+vector<int> G[maxn];
+
+int MaxFlow(int s, int t) {
+    int flow = 0;
+    while(true) {
+        memset(a, 0, sizeof(a));
+        p[s] = s; a[s] = INF;
+        queue<int> q;
+        q.push(s);
+        while (!q.empty()) {
+            int u = q.front(); q.pop();
+            for (int i = 0; i < G[u].size(); i++) {
+                Edge &e = edges[G[u][i]];
+                if (!a[e.v] && e.cap > e.flow) {
+                    a[e.v] = min(a[u], e.cap - e.flow);
+                    p[e.v] = G[u][i];
+                    q.push(e.v);
+                }
+            }
+            if (a[t]) break;
+        }
+        if (!a[t]) break;
+        flow += a[t];
+        for (int u = t; u != s; u = edges[p[u]].u) {
+            edges[p[u]].flow += a[t];
+            edges[p[u]^1].flow -= a[t];
+        }
+    }
+    return flow;
+}
+
+void addEdge(int u, int v, int cap) {
+    edges.push_back(Edge(u, v, cap));
+    edges.push_back(Edge(v, u, 0));
+    G[u].push_back(edges.size() - 2);
+    G[v].push_back(edges.size() - 1);
+}
+
+void init() {
+    edges.clear();
+    for (int i = 0; i < maxn; i++) G[i].clear();
+}
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while (T--) {
+        int ans = 0;
+        init();
+	scanf("%d%d%d%d%d", &w, &h, &d, &f, &b);
+	for (int i = 1; i <= h; i++) scanf("%s", s[i] + 1);
+	for (int i = 1; i <= w; i++) {
+            if (s[1][i] == '.') { s[1][i] = '#'; ans += f;}
+            if (s[h][i] == '.') { s[h][i] = '#'; ans += f;}
+        }
+	for (int i = 1; i <= h; i++) {
+            if (s[i][1] == '.') { s[i][1] = '#'; ans += f;}
+            if (s[i][w] == '.') { s[i][w] = '#'; ans += f;}
+        }
+        for (int i = 1; i <= h; i++)
+            for (int j = 1; j <= w; j++) {
+                int u = i * (w - 1) + j;
+                if (s[i][j] == '.') addEdge(0, u, f);
+                else {
+                    int cap = d;
+                    if (i == 1 || i == h || j == 1 || j == w) cap = INF;
+                    addEdge(u, h * w + 1, cap);
+                }
+                for (int k = 0; k < 4; k++) 
+                    if (i + dx[k] > 0 && i + dx[k] <= h && j + dy[k] > 0 && j + dy[k] <= w) {
+                    int v = (i + dx[k]) * (w - 1) + j + dy[k];
+                    addEdge(u, v, b);
+                }
+            }
+        ans += MaxFlow(0, h * w + 1);
+        printf("%d\n", ans);
+    }
+    return 0;
+}

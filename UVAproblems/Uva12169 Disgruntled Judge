@@ -1,0 +1,46 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<cmath>
+#include<algorithm>
+
+using namespace std;
+typedef long long LL;
+const int n = 10001, maxn = 100 + 2;
+LL T, g[2 * maxn], f[2 * maxn];
+
+void exgcd(int a, int b, int &d, int &x, int &y) {
+    if (!b) { d = a; x = 1; y = 0; }
+    else { exgcd(b, a%b, d, y, x); y -= (a/b)*x; }
+}
+
+int mod_equation(int a, int b) {
+    int d, x, y;
+    exgcd(a, n, d, x, y);
+    if (b%d) return -1;
+    x = (x * (b / d) % n + n) % n;
+    return x;
+}
+
+int main() {
+    scanf("%lld", &T);
+    T *= 2;
+    for (int i = 1; i <= T; i += 2) scanf("%lld", &g[i]);
+    f[1] = g[1];
+    for (LL a = 0; a < n; a++) {
+        bool ok = true;
+        int b = mod_equation((a + 1) % n, ((g[3] - a*a*g[1]) % n + n) % n);
+        if (b == -1) continue;
+        for (int i = 2; i <= T; i++) {
+            f[i] = (a * f[i - 1] + b) % n;
+            if (i % 2 && f[i] != g[i]) { ok = false; break;}
+        }
+        if (ok) {
+            for (int i = 2; i <= T; i += 2) 
+                printf("%lld\n", f[i]);
+            break;
+        }
+        
+    }
+    return 0;
+}

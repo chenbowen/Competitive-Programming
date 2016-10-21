@@ -1,0 +1,88 @@
+#include<cstdio>
+#include<cstring>
+#include<queue>
+#include<vector>
+using namespace std;
+
+
+const int MAXN = 256 + 10;
+char s[50];
+int Right[MAXN], Left[MAXN], Nodes[MAXN], cnt, root;
+bool failed;
+
+void newTree() {
+    int size = sizeof(Right);
+    memset(Right, 0, size);
+    memset(Left, 0, size);
+    memset(Nodes, 0, size);
+    cnt = root = 1;
+}
+
+int newNode() {
+    return ++cnt;
+}
+
+void addNewNode(int v, char *c) {
+    int l = strlen(c), it = root, i, num;
+    for (i = 0; i < l; i++) {
+        if (c[i] == 'L') {
+            if (!Left[it]) Left[it] = newNode();
+            it = Left[it];
+        }
+        else {
+            if (!Right[it]) Right[it] = newNode();
+            it = Right[it];
+        }
+    }
+    if (Nodes[it]) { failed = true; return;}
+    else Nodes[it] = v;
+}
+
+void dfs(int node) {
+    printf("%d ", Nodes[node]);
+    if (Left[node]) dfs(Left[node]);
+    if (Right[node]) dfs(Right[node]);
+}
+
+vector<int> bfs() {
+    queue<int> q;
+    vector<int> r;
+    if (Nodes[root])
+        q.push(root);
+    for (int i = 0; i < cnt; i++) {
+        if (q.empty()) { failed = true; break;}
+        int t = q.front(); q.pop();
+        r.push_back(Nodes[t]);
+        if (Left[t]) q.push(Left[t]);
+        if (Right[t]) q.push(Right[t]);
+    }
+    return r;
+}
+
+int main() {
+    //freopen("in", "r", stdin);
+    //freopen("out", "w", stdout);
+    
+    while (~scanf("%s", s)) {
+        newTree();
+        failed = false;
+        while (s[1] != ')') {
+            int v;
+            sscanf(s + 1, "%d", &v);
+            s[strlen(s) - 1] = '\0';
+            addNewNode(v, strchr(s, ',') + 1);            
+            scanf("%s", s);
+        }
+        //dfs(root); printf("\n");
+        vector<int> res = bfs();
+        if (failed) printf("not complete\n");
+        else {
+            int size = res.size();
+            printf("%d", res[0]);
+            for (int i = 1; i < size; i++) printf(" %d", res[i]);
+            printf("\n");
+        }
+    }
+    
+    return 0;
+}

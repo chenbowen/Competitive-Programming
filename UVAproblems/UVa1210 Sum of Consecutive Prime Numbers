@@ -1,0 +1,43 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+const int maxn = 1e4 + 2;
+int prime[maxn], cnt, n, sum[maxn];
+bool vis[maxn];
+
+void init() {
+    int m = sqrt(maxn + 0.5);
+    for (int i = 2; i <= m; i++) if (!vis[i]) 
+        for (int j = i * i; j < maxn; j += i) vis[j] = 1;
+    prime[0] = sum[1] = 2;
+    cnt = 1;
+    for (int i = 3; i < maxn; i++) if (!vis[i]) {
+        prime[cnt] = i;
+        sum[cnt + 1] = sum[cnt] + i;
+        cnt++;
+    }
+}
+
+int main() {
+    init();
+    while (scanf("%d", &n) == 1 && n) {
+        int ans = 0;
+        for (int i = 0; i < cnt; i++) {
+            int l = i, r = cnt;
+            while (l < r) {
+                int m = (l + r) / 2;
+                int s = sum[m] - sum[i];
+                if (s < n) l = m + 1;
+                else if (s > n) r = m;
+                else {
+                    ans++;
+                    break;
+                }
+            }
+        }
+        printf("%d\n", ans);
+    }
+    return 0;
+}

@@ -1,0 +1,101 @@
+#include <iostream>
+#include <cstdio>
+#include <vector>
+#include <utility>
+#include <cstring>
+
+using namespace std;
+const int MAXN = 10 + 2;
+int b[MAXN][MAXN], R, C, sx, sy, st, sf, len;
+int dx[] = {0, -1, 0, 1}, dy[] = {1, 0, -1, 0}, dice[7][7];    
+bool vis[MAXN][MAXN][7][7], ok, first;
+vector<pair<int, int> > path;
+
+void build_dice() {             //dice[top][face] = right
+    dice[1][2] = 3;
+    for (int i = 1; i < 7; i++) {
+        for (int j = 1; j < 7; j++) {
+            if (i == j) continue;
+            if (dice[i][7 - j]) dice[i][j] = 7 - dice[i][7 - j];
+            if (dice[i][j]) { 
+                dice[j][i] = 7 - dice[i][j];
+                dice[i][dice[i][j]] = 7 - j;
+            }
+        }
+    }
+}
+
+pair<int, int> rotate(int top, int face, int di) {
+    pair<int, int> n_tf;
+    if (di == 0) {
+        n_tf.second = face;
+        n_tf.first = 7 - dice[top][face];
+    }
+    else if (di == 1) {
+        n_tf.first = face;
+        n_tf.second = 7 - top;
+    }
+    else if (di == 2) {
+        n_tf.second = face;
+        n_tf.first = dice[top][face];
+    }
+    else {
+        n_tf.second = top;
+        n_tf.first = 7 - face;
+    }
+    return n_tf;
+}
+
+bool inside(int x, int y) {
+    return x > 0 && y > 0 && x <= R && y <= C;
+}
+
+void dfs(int x, int y, int t, int f) {
+    path.push_back(make_pair(x, y));
+    if (x == sx && y == sy) 
+        if (first) first = 0;
+        else { ok = 1; return;}
+    vis[x][y][t][f] = 1;
+    
+    for (int i = 0; i < 4; i++) {
+        pair<int, int> nextp = rotate(t, f, i);
+        int nx = x + dx[i], ny = y + dy[i];
+        int nt = nextp.first, nf = nextp.second;
+        if (inside(nx, ny) && (!vis[nx][ny][nt][nf] || (nx == sx && ny == sy)) && (t == b[nx][ny] || b[nx][ny] == -1)) {
+            dfs(nx, ny, nt, nf);
+        }
+        if (ok) return;
+    }
+    vis[x][y][t][f] = 0;
+    path.pop_back();
+}
+
+int main() {
+    build_dice();
+    char name[25];
+    while (scanf("%s", name) == 1 && strcmp(name, "END")) {
+        scanf("%d%d%d%d%d%d", &R, &C, &sx, &sy, &st, &sf);
+        memset(vis, 0, sizeof(vis));
+        memset(b, 0, sizeof(b));
+        path.clear(); ok = 0; first = 1;
+        for (int i = 1; i <= R; i++) 
+            for (int j = 1; j <= C; j++)
+                scanf("%d", &b[i][j]);
+        dfs(sx, sy, st, sf);
+        len = path.size();
+        printf("%s", name);
+        if (ok) 
+            for (int i = 0; i < len; i++) {
+                if (i % 9 == 0) {
+                    if (i >= 9) printf(",");
+                    printf("\n  (%d,%d)", path[i].first, path[i].second);
+                }
+                else printf(",(%d,%d)", path[i].first, path[i].second);
+            }
+        else printf("\n  No Solution Possible");
+        printf("\n");
+    }
+    
+    
+    return 0;
+}

@@ -1,0 +1,24 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<cmath>
+#include<algorithm>
+using namespace std;
+typedef long long LL;
+
+int pow_mod(int b, int p, int m) {
+    if (!p) return 1;
+    LL ans = pow_mod(b, p/2, m);
+    ans *= ans;
+    if (p%2) ans *= b;
+    return ans % m;
+}
+
+int main() {
+    int b, p, m;
+    while (scanf("%d%d%d", &b, &p, &m) == 3) {
+        printf("%d\n", pow_mod(b, p, m));
+        
+    }
+    return 0;
+}

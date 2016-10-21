@@ -1,0 +1,62 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int maxn = 50 + 3, maxt = 200 + 3;
+int n, t, cost[maxn], m1, m2, lstart[maxn], rstart[maxn];
+int d[maxn][maxt], maxans;
+bool L[maxn][maxt], R[maxn][maxt];
+
+void init() {
+    memset(L, 0, sizeof(L));
+    memset(R, 0, sizeof(R));
+    int _t = 0;
+    for (int i = 0; i < n; i++) {
+        _t += cost[i];
+        for (int j = 0; j < m1; j++) if (_t + lstart[j] <= t) L[i][_t + lstart[j]] = 1;
+    }
+    _t = 0;
+    for (int i = n - 1; i >= 0; i--) {
+        _t += cost[i + 1];
+        for (int j = 0; j < m2; j++) if (_t + rstart[j] <= t) R[i][_t + rstart[j]] = 1;
+    }
+    memset(d, -1, sizeof(d)); 
+    d[n - 1][t] = 0;
+}
+
+int dp(int _n, int _t) {
+    int &ans = d[_n][_t];
+    if (ans != -1) return ans;
+    ans = maxt;
+    //d[i][j] = min{d[i][j], d[i][j + 1] + 1, d[i - 1][j - cost[i], d[i + 1][j - cost[i + 1]};
+    if (_n != n - 1 && _t + cost[_n + 1] <= t && L[_n][_t]) 
+        ans = min(ans, dp(_n + 1, _t + cost[_n + 1]));
+    if (_n != 0 && _t + cost[_n] <= t && R[_n][_t]) 
+        ans = min(ans, dp(_n - 1, _t + cost[_n]));
+    if (_t != t) 
+        ans = min(ans, dp(_n, _t + 1) + 1);
+    return ans;
+}
+
+
+int main() {
+    int kase = 0;
+    while (scanf("%d", &n) == 1 && n) {
+        printf("Case Number %d: ", ++kase);
+        scanf("%d", &t);
+        maxans = t;
+        for (int i = 1; i < n; i++) { 
+            scanf("%d", &cost[i]);
+            maxans -= cost[i];
+        }
+        cost[0] = cost[n] = 0;
+        scanf("%d", &m1);
+        for (int i = 0; i < m1; i++) scanf("%d", &lstart[i]);
+        scanf("%d", &m2);
+        for (int i = 0; i < m2; i++) scanf("%d", &rstart[i]);
+        init();
+        if (maxans < lstart[0]) { printf("impossible\n"); continue;}
+        printf("%d\n", dp(0, 0));
+    }
+    return 0;
+}

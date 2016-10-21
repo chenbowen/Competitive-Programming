@@ -1,0 +1,48 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+const int maxn = 100000 + 5;
+const double eps = 1e-9;
+int L, D, N;
+
+bool zero(double num) {
+    return fabs(num) < eps;
+}
+
+struct Vill {
+    int x, y;
+    double l, r;
+    Vill(int x = 0, int y = 0, double l = 0, double r = 0): x(x), y(y), l(l), r(r) {}
+    void cal() {
+        double d = sqrt(D*D - y*y);
+        if (zero(d)) l = r = x;
+        else {
+            l = x * 1.0 - d;
+            r = x * 1.0 + d;
+        }
+    }
+    bool operator < (const Vill &rhs) const {
+        return r < rhs.r || zero(r - rhs.r) && l < rhs.l;
+    }
+}a[maxn];
+
+int main() {
+    while (scanf("%d", &L) == 1 && L) {
+       scanf("%d%d", &D, &N);
+       for (int i = 0; i < N; i++) {
+           scanf("%d%d", &a[i].x, &a[i].y);
+           a[i].cal();
+       }
+       sort(a, a + N);
+       int ans = 0;
+       for (int i = 0; i < N; i++) {
+           ans++;
+           double ex = a[i].r;
+           while (i + 1 < N && (a[i + 1].l < ex || zero(a[i + 1].l - ex))) i++;
+       }
+       printf("%d\n", ans);
+    }
+    return 0;
+}

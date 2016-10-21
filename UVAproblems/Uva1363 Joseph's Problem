@@ -1,0 +1,30 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+const int maxn = 100 + 5;
+typedef long long LL;
+int n, k;
+
+int main() {
+    while (scanf("%d%d", &n, &k) == 2) {
+        int i = 1;
+        LL ans = 0;
+        while (i <= n) {
+            LL p = k / i;
+            if (p) {
+                LL last = k % i, num = min(LL(k - i * p) / p, LL(n - i)) + 1;
+                LL first = last - (num - 1) * p;
+                ans += (first + last) * num / 2;
+                i += num;
+            }
+            else {
+                ans += LL(n - i + 1) * k;
+                i = n + 1;
+            }
+        }
+        printf("%lld\n", ans);
+    }
+    return 0;
+}

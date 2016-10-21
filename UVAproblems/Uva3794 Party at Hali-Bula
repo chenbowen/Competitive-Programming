@@ -1,0 +1,60 @@
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+#include<cmath>
+#include<iostream>
+#include<map>
+#include <vector>
+using namespace std;
+const int maxn = 200 + 10;
+int n, d[maxn], sum_son[maxn];
+bool uniq[maxn][2];
+map<string, int> trans;
+vector<int> g[maxn];
+
+void dfs(int i, int f, int gf) {
+    vector<int> &sons = g[i];
+    for (auto j: sons) dfs(j, i, f);
+    if(!sons.empty()) {
+        if (d[i] < sum_son[i]) {
+            d[i] = sum_son[i];
+            uniq[i][0] = uniq[i][1];
+        }
+        else if (d[i] == sum_son[i]) uniq[i][0] = 0;
+    }
+    if (f != -1) {
+        sum_son[f] += d[i];
+        uniq[f][1] = uniq[f][1] && uniq[i][0];
+    }
+    if (gf != -1) {
+        d[gf] += d[i];
+        uniq[gf][0] = uniq[gf][0] && uniq[i][0];
+    }
+}
+
+
+int main() {
+    while (scanf("%d", &n) == 1 && n) {
+        trans.clear();
+        fill(d, d + maxn, 1);
+        fill(sum_son, sum_son + maxn, 0);
+        memset(uniq, 1, sizeof(uniq));
+        for (int i = 0; i < n; i++) g[i].clear();
+        int idx = 0;
+        string s1, s2;
+        cin >> s1;
+        trans[s1] = idx++;
+        for (int i = 1; i < n; i++) { 
+            cin >> s1 >> s2;
+            int idx1 = trans.count(s1), idx2 = trans.count(s2);
+            if (idx1 == 0) trans[s1] = idx++;
+            if (idx2 == 0) trans[s2] = idx++;
+            g[trans[s2]].push_back(trans[s1]);
+        }
+        dfs(0, -1, -1);
+        printf("%d ", d[0]);
+        if (uniq[0][0]) printf("Yes\n");
+        else printf("No\n");
+    }
+    return 0;
+}

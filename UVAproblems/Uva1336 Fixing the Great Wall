@@ -1,0 +1,133 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<cmath>
+#include<algorithm>
+
+using namespace std;
+const int maxn = 1000 + 5;
+const int inf = 0x3f3f3f3f;
+int n, v, x, s;
+int sum[maxn];
+double d[maxn][maxn][2], t[maxn][maxn][2];
+
+struct Sec {
+    int p, c, del;
+    Sec(int p = 0, int c = 0, int del = 0): p(p), c(c), del(del) {}
+    bool operator < (const Sec &rhs) const {
+        return p < rhs.p;
+    }
+}p[maxn];
+
+void update(int x1, int y1, int k1, int x2, int y2, int k2) {
+    if (y2 >= s && x2 <= s) {
+        double &ans = d[x1][y1][k1], nt;
+        int curc;
+        if (k1 == 0) curc = x1;
+        else curc = y1;
+        if (k1 == k2)
+            nt = max(abs(p[x2].p - p[x1].p), abs(p[y2].p - p[y1].p)) * 1.0 / v;
+        else
+            nt = (max(p[y2].p, p[y1].p) - min(p[x1].p, p[x2].p)) * 1.0 / v;
+        double cost = p[curc].c * 1.0 + nt * (p[curc].del + sum[n] -sum[max(y1, y2) + 1] + sum[min(x1, x2)]);
+        if (ans > d[x2][y2][k2] + cost) {
+            ans = d[x2][y2][k2] + cost;
+        }
+    } 
+}
+
+int main() {
+    while (scanf("%d%d%d", &n, &v, &x) == 3 && n) {
+        for (int i = 1; i <= n; i++) scanf("%d%d%d", &p[i].p, &p[i].c, &p[i].del);
+        p[0] = Sec(x, 0, 0);
+        n++;
+        sort(p, p + n);
+        memset(sum, 0, sizeof(sum));
+        for (int i = 0; i < n; i++) {
+            if (p[i].p == x) s = i;
+            if (i) sum[i + 1] = sum[i] + p[i].del;
+            else sum[i + 1] = p[i].del;
+        }
+        for (int i = s; i >= 0; i--)
+            for (int j = s; j < n; j++) {
+                if (i == j) {
+                    d[i][j][0] = d[i][j][0] = 0;
+                    continue;
+                }
+                d[i][j][0] = d[i][j][1] = inf;
+                for (int k = 0; k < 2; k++) {
+                    update(i, j, 0, i + 1, j, k);
+                    update(i, j, 1, i, j - 1, k);
+                }
+            }
+        int ans = floor(min(d[0][n - 1][0], d[0][n - 1][1]));
+        printf("%d\n", ans);
+    }
+    return 0;
+}
+
+
+///////////////////////////////////////////////////////////
+/*#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+
+using namespace std;
+const int maxn = 1000 + 5;
+const int inf = 0x3f3f3f3f;
+int n, v, x, s;
+double d[maxn][maxn][2], t[maxn][maxn][2];
+
+struct Sec {
+    int p, c, del;
+    Sec(int p = 0, int c = 0, int del = 0): p(p), c(c), del(del) {}
+    bool operator < (const Sec &rhs) const {
+        return p < rhs.p;
+    }
+}p[maxn];
+
+void update(int x1, int y1, int k1, int x2, int y2, int k2) {
+    if (y2 >= s && x2 <= s) {
+        double &ans = d[x1][y1][k1], nt;
+        int curc;
+        if (k1 == 0) curc = x1;
+        else curc = y1;
+        if (k1 == k2)
+            nt = max(abs(p[x2].p - p[x1].p), abs(p[y2].p - p[y1].p)) * 1.0 / v;
+        else
+            nt = (max(p[y2].p, p[y1].p) - min(p[x1].p, p[x2].p)) * 1.0 / v;
+        double cost = p[curc].c * 1.0 + (t[x2][y2][k2] + nt) * 1.0 * p[curc].del;
+        if (ans > d[x2][y2][k2] + cost) {
+            ans = d[x2][y2][k2] + cost;
+            t[x1][y1][k1] = t[x2][y2][k2] + nt;
+        }
+    } 
+}
+
+int main() {
+    freopen("in.txt", "r", stdin);
+    while (scanf("%d%d%d", &n, &v, &x) == 3 && n) {
+        for (int i = 1; i <= n; i++) scanf("%d%d%d", &p[i].p, &p[i].c, &p[i].del);
+        p[0] = Sec(x, 0, 0);
+        n++;
+        sort(p, p + n);
+        for (int i = 0; i < n; i++) if (p[i].p == x) { s = i; break;}
+        for (int i = s; i >= 0; i--)
+            for (int j = s; j < n; j++) {
+                if (i == j) {
+                    d[i][j][0] = t[i][j][0] = 0;
+                    d[i][j][1] = t[i][j][1] = 0;
+                    continue;
+                }
+                d[i][j][0] = d[i][j][1] = t[i][j][0] = t[i][j][1] = inf;
+                for (int k = 0; k < 2; k++) {
+                    update(i, j, 0, i + 1, j, k);
+                    update(i, j, 1, i, j - 1, k);
+                }
+            }
+        int ans = min(d[0][n - 1][0], d[0][n - 1][1]);
+        printf("%d\n", ans);
+    }
+    return 0;
+}*/

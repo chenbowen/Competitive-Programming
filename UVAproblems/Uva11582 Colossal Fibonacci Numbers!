@@ -1,0 +1,45 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<cmath>
+#include<iostream>
+#include<algorithm>
+
+using namespace std;
+typedef unsigned long long ULL;
+const int maxn = 1000 + 5;
+int f[maxn][6*maxn], p[maxn];
+
+int pow_mod(int a, ULL b, int n) {
+    if (b == 0) return 1;
+    int ans = pow_mod(a, b/2, n);
+    ans = ans * ans % n;
+    if (b%2) ans = ans * a % n;
+    return ans;
+}
+
+int main() {
+    for (int n = 2; n < 1001; n++) {
+        f[n][0] = 0;
+        f[n][1] = 1;
+        for (int i = 2; ; i++) {
+            f[n][i] = (f[n][i - 2] + f[n][i - 1]) % n;
+            if (f[n][i - 1] == 0 && f[n][i] == 1) {
+                p[n] = i - 1;
+                break;
+            }
+        }
+    }
+    int T;
+    cin >> T;
+    while (T--) {
+        ULL a, b;
+        int n;
+        cin >> a >> b >> n;
+        if (a == 0 || n == 1) {printf("0\n"); continue;}
+        int ans = pow_mod(a % p[n], b, p[n]);
+        printf("%d\n", f[n][ans]);
+    }
+    
+    return 0;
+}

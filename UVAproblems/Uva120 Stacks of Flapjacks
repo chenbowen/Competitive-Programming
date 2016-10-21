@@ -1,0 +1,46 @@
+#include <cstdio> 
+#include <iostream>
+#include <cstring>
+#include <sstream>
+#include <utility>
+#include <algorithm>
+using namespace std;
+const int MAXN = 30 + 5;
+int a[MAXN], n, _order[MAXN], ans[3 * MAXN], cnt;
+
+void _swap(int d) {
+    int m = 1 + d / 2;
+    if (m == 1) return;
+    for (int i = 1; i < m; i++) swap(a[i], a[d - i + 1]);
+    ans[cnt++] = n - d + 1;
+}
+
+bool _cmp (int a, int b) {
+    return a > b;
+}
+
+int main() {
+    string s;
+    while (getline(cin, s)) {
+        cout << s << endl;
+        stringstream ss(s);
+        int i = 1;
+        while (ss >> a[i]) { _order[i] = a[i]; i++;}
+        n = i - 1;
+        cnt = 0;
+        sort(_order + 1, _order + n + 1, _cmp); 
+        i = 1;
+        while (i <= n) {
+            int j = 1;
+            while (j <= n && a[j] != _order[i]) j++;
+            if (j != n - i + 1) {
+                if (j != 1) _swap(j);
+                _swap(n - i + 1);
+            }
+            i++;
+        }
+        for (i = 0; i < cnt; i++) printf("%d ", ans[i]);
+        printf("0\n");
+    }
+    return 0;
+}

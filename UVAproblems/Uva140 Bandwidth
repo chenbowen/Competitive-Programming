@@ -1,0 +1,75 @@
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <set>
+#include <climits>
+#include <algorithm>
+using namespace std;
+
+const int MAXN = 30 + 5;
+set<int> Node;
+bool f[MAXN], G[MAXN][MAXN];
+int n, ans, sol[MAXN], temp[MAXN];
+
+bool read_input() {
+    char input[100];
+    if (scanf("%s", input) != 1 || input[0] == '#') return false;
+    int size = strlen(input), i = 0;
+    Node.clear();
+    memset(G, 0, sizeof(G));
+    while (i < size) {
+        int v = input[i] - 'A';
+        i += 2;
+        Node.insert(v);
+        while (i < size && input[i] != ';') {
+            G[v][input[i] - 'A'] = G[input[i] - 'A'][v] = 1;
+            Node.insert(input[i] - 'A');
+            i++;
+        }
+        i++;
+    }
+    n = Node.size();  
+    return true;
+}
+
+bool smaller(int index, int chr) {
+    temp[index] = chr;
+    int bandwidth = 0;
+    for (int i = 0; i <= index; i++) 
+        for (int j = 0; j < MAXN; j++) 
+            if (j != temp[i] && G[temp[i]][j]) 
+                for (int k = 0; k <= index; k++) 
+                    if (j == temp[k]) bandwidth = max(bandwidth, abs(k - i));
+    if (!bandwidth) return true;
+    if (ans > bandwidth) {
+        if (index == n - 1) ans = bandwidth;
+        return true;
+    }
+    return false;
+}
+
+void find_bandwidth(int dep) {
+    if (dep == n) {
+        for (int i = 0; i < n; i++) sol[i] = temp[i];
+        return;
+    }
+    for (auto it: Node) 
+        if (!f[it] && smaller(dep, it)) {
+            f[it] = 1;
+            temp[dep] = it;
+            find_bandwidth(dep + 1);
+            f[it] = 0;
+        } 
+}
+
+int main() {
+    while (read_input()) {
+        ans = INT_MAX;
+        memset(f, 0, sizeof(f));
+        if (n == 1) { printf("%c -> 0\n", *Node.begin() + 'A'); continue;}
+        find_bandwidth(0);
+        for (int i = 0; i < n; i++) printf("%c ", sol[i] + 'A');
+        printf("-> %d\n", ans);
+    }
+    return 0;
+}

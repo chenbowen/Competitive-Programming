@@ -1,0 +1,50 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <ctime>
+
+using namespace std;
+int f[7][7];
+int op[7] = {0, 6, 5, 4, 3, 2, 1};
+
+bool same(char* a, char* b) {
+    for (int i = 0; i < 6; i++)
+        if (a[i] != b[i]) return false;
+    return true;
+}
+int main() {
+    
+    f[1][2] = 3;
+    for (int i = 1; i <= 6; i++) {
+        for (int j = 1; j <= 6; j++) {
+            if (j == i || j == op[i]) continue;
+            if (f[j][i]) f[i][j] = op[f[j][i]];
+            if (f[i][op[j]]) f[i][j] = op[f[i][op[j]]];
+            if (f[i][j]) f[i][f[i][j]] = op[j];
+        }
+    }
+    char st[14], s1[7], s2[7];
+    while (scanf("%s", st) != EOF) {
+        bool ok = 0;
+        for (int i = 0; i < 6; i++) {
+            s1[i] = st[i];
+            s2[i] = st[i + 6];
+        }
+        for (int i = 1; i <= 6; i++) {
+            for (int j = 1; j <= 6; j++) {
+                if (j == i || j == op[i]) continue;
+                char s[7];
+                s[0] = s1[i - 1];
+                s[1] = s1[j - 1];
+                s[2] = s1[f[i][j] - 1];
+                s[3] = s1[op[f[i][j]] - 1];
+                s[4] = s1[op[j] - 1];
+                s[5] = s1[op[i] - 1];
+                if (same(s, s2)) {ok = 1; break;}    
+            }
+        }
+        if (ok) printf("TRUE\n");
+        else printf("FALSE\n");
+    }
+    return 0;
+}

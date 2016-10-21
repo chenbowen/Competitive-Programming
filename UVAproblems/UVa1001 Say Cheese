@@ -1,0 +1,77 @@
+#include<cstdio>
+#include<cstring>
+#include<cmath>
+#include<queue>
+#include<algorithm>
+
+using namespace std;
+const int maxn = 200 + 10, INF = 100000000;
+int n, x[maxn], y[maxn], z[maxn], r[maxn];
+double d[maxn];
+bool done[maxn];
+
+struct Edge {
+    int u, v;
+    double d;
+    Edge(int u = 0, int v = 0, double d = 0): u(u), v(v), d(d) {}
+};
+vector<Edge> edges;
+vector<int> G[maxn];
+
+struct HeapNode {
+    int v;
+    double d;
+    HeapNode(int v = 0, int d = 0): v(v), d(d) {}
+    bool operator < (const HeapNode &rhs) const {
+        return d > rhs.d;
+    }
+};
+
+double Dijkstra(int s, int t) {
+    priority_queue<HeapNode> q;
+    q.push(HeapNode(s, 0));
+    for (int i = 0; i < maxn; i++) d[i] = INF;
+    d[s] = 0;
+    memset(done, 0, sizeof(done));
+    while (!q.empty()) {
+        HeapNode cur = q.top(); q.pop();
+        if (done[cur.v]) continue;
+        done[cur.v] = true;
+        for (int i = 0; i < G[cur.v].size(); i++) {
+            Edge &e = edges[G[cur.v][i]];
+            if (d[e.v] > d[cur.v] + e.d) {
+                d[e.v] = d[cur.v] + e.d;
+                q.push(HeapNode(e.v, d[e.v]));
+            }
+        }
+    }
+    return d[t];
+}
+
+void init() {
+    edges.clear();
+    for (int i = 0; i < maxn; i++) G[i].clear();
+}
+
+int main() {
+    int kase = 0;
+    while (scanf("%d", &n) == 1 && n != -1) {
+        init();
+        for (int i = 1; i <= n; i++)
+            scanf("%d%d%d%d", &x[i], &y[i], &z[i], &r[i]);
+        scanf("%d%d%d", &x[0], &y[0], &z[0]);
+        r[0] = r[n + 1] = 0;
+        scanf("%d%d%d", &x[n + 1], &y[n + 1], &z[n + 1]);
+        for (int i = 0; i <= n + 1; i++)
+            for (int j = 0; j <= n + 1; j++) if (i != j) {
+                double dis = sqrt(pow(x[i] - x[j], 2) + pow(y[i] - y[j], 2) + pow(z[i] - z[j], 2));
+                if (dis <= r[i] + r[j]) dis = 0;
+                else dis -= r[i] + r[j];
+                edges.push_back(Edge(i, j, dis));
+                G[i].push_back(edges.size() - 1);
+            }
+        double ans = Dijkstra(0, n + 1);
+        printf("Cheese %d: Travel time = %d sec\n", ++kase, int(round(ans * 10)));
+    }
+    return 0;
+}

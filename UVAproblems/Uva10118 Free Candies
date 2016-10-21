@@ -1,0 +1,40 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+#include<set>
+
+using namespace std;
+const int maxn = 40 + 2;
+int n, p[4][maxn], dis[maxn][maxn][maxn][maxn];
+multiset<int> e;
+
+int dp(int a, int b, int c, int d) {
+    if (e.size() == 5) return 0;
+    int &ans = dis[a][b][c][d];
+    if (ans != -1) return ans;
+    ans = a + b + c + d - e.size();
+    int temp[4] = {a, b, c, d};
+    for (int i = 0; i < 4; i++) if (temp[i] != n) {
+        temp[i]++;
+        int res = e.count(p[i][temp[i]]);
+        if (res) e.erase(p[i][temp[i]]);
+        else e.insert(p[i][temp[i]]);
+        ans = max(ans, dp(temp[0], temp[1], temp[2], temp[3]));
+        if (res) e.insert(p[i][temp[i]]);
+        else e.erase(p[i][temp[i]]);
+        temp[i]--;
+    }
+    return ans;
+}
+
+int main() {
+    while (scanf("%d", &n) == 1 && n) {
+        for (int i = 1; i <= n; i++)
+            for (int j = 0; j < 4; j++) scanf("%d", &p[j][i]);
+        memset(dis, -1, sizeof(dis));
+        e.clear();
+        printf("%d\n", dp(0, 0, 0, 0) / 2);
+    }
+    return 0;
+}

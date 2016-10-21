@@ -1,0 +1,26 @@
+import java.math.BigInteger;
+import java.util.Scanner;
+ 
+public class Main {
+ 
+    public static void main(String[] args) {
+		
+    	Scanner in = new Scanner(System.in);
+		int T = in.nextInt();
+		
+		for(int kase=0; kase<T; kase++) {
+			BigInteger n = in.nextBigInteger();
+			BigInteger ans = new BigInteger("1");
+			BigInteger a = n;
+			for(int i=1; i<4; i++)
+				a = a.multiply(n.subtract(BigInteger.valueOf(i)));
+			ans = ans.add(a.divide(BigInteger.valueOf(24)));
+			a = n.multiply(n.subtract(BigInteger.valueOf(1)));
+			ans = ans.add(a.divide(BigInteger.valueOf(2)));
+			System.out.println(ans);
+			
+		}
+		
+    }
+ 
+}

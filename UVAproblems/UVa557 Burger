@@ -1,0 +1,24 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+const int maxn = 100010;
+double f[maxn];
+
+void init() {
+    f[2] = 1;
+    for (int i = 4; i < maxn; i++)
+        f[i] = double(i - 3) / (i - 2) * f[i - 2];
+}
+
+int main() {
+    init();
+    int T, n;
+    scanf("%d", &T);
+    while (T--) {
+        scanf("%d", &n);
+        printf("%.4f\n",1 - f[n]);
+    }
+    return 0;
+}

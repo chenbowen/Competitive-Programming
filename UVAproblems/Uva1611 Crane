@@ -1,0 +1,49 @@
+#include <cstdio>
+#include <cstring>
+#include <utility>
+#include <cstdlib>
+#include <algorithm>
+using namespace std;
+const int MAXN = 10000 + 5;
+int n, a[MAXN], _left[13*MAXN], _right[13*MAXN], cnt;
+
+void _swap(int s, int e) {
+    int m = s + (e - s)/2;
+    for (int i = s; i < m; i++) swap(a[i], a[i - s + m]);
+    _left[cnt] = s;
+    _right[cnt++] = e - 1;
+}
+
+void move_forward(int s, int e) {
+    if (e - s == 2) {
+        _swap(s, e);
+        return;
+    }
+    if ((e - s) % 2) {
+        _swap(s + 1, e);
+        move_forward(s, e - (e - s - 1) / 2);
+    }
+    else {
+        _swap(s, e);
+        move_forward(s, e - (e - s) / 2);
+    }
+}
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while (T--) {
+        scanf("%d", &n);
+        cnt = 0;
+        for (int i = 1; i <= n; i++) scanf("%d", &a[i]);
+        for (int i = 1; i <= n; i++) {
+            int j = i;
+            while (j <= n && a[j] != i) j++;
+            if (i == j) continue;
+            move_forward(i, j + 1);
+        }
+        printf("%d\n", cnt);
+        for (int i = 0; i < cnt; i++) printf("%d %d\n", _left[i], _right[i]);
+    }
+    return 0;
+}

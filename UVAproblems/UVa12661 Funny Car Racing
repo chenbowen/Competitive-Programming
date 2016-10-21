@@ -1,0 +1,74 @@
+#include<cstdio>
+#include<cstring>
+#include<queue>
+#include<algorithm>
+#include<vector>
+
+using namespace std;
+const int maxn = 300 + 10;
+const int INF = 2000000000;
+int n, m, s, t, d[maxn];
+bool done[maxn];
+
+struct Edge {
+    int u, v, a, b, t;
+    Edge(int u = 0, int v = 0, int a = 0, int b = 0, int t = 0): u(u), v(v), a(a), b(b), t(t) {}
+};
+vector<Edge> edges;
+vector<int> G[maxn];
+
+struct HeapNode {
+    int d, u;
+    HeapNode(int d = 0, int u = 0): d(d), u(u){}
+    bool operator < (const HeapNode &rhs) const {
+        return d > rhs.d;
+    }
+};
+
+int Dijkstra(int s, int t) {
+    for (int i = 1; i <= n; i++) d[i] = INF;
+    memset(done, 0, sizeof(done));
+    priority_queue<HeapNode> q;
+    d[s] = 0;
+    q.push(HeapNode(0, s));
+    while (!q.empty()) {
+        HeapNode cur = q.top(); q.pop();
+        if (done[cur.u]) continue;
+        done[cur.u] = true;
+        if (cur.u == t) break;
+        for (int i = 0; i < G[cur.u].size(); i++) {
+            Edge &e = edges[G[cur.u][i]];
+            int dd = 0;
+            if (cur.d % (e.a + e.b) + e.t > e.a) dd = e.a + e.b - (cur.d % (e.a + e.b));
+            if (d[e.v] > cur.d + e.t + dd) {
+                d[e.v] = cur.d + e.t + dd;
+                q.push(HeapNode(d[e.v], e.v));
+            }
+        }
+    }
+    return d[t];
+}
+
+void addEdge(int u, int v, int a, int b, int t) {
+    edges.push_back(Edge(u, v, a, b, t));
+    G[u].push_back(edges.size() - 1);
+}
+
+void init() {
+    edges.clear();
+    for (int i = 0; i < maxn; i++) G[i].clear();
+}
+
+int main() {
+    int kase = 0;
+    while (scanf("%d%d%d%d", &n, &m, &s, &t) == 4) {
+        init();
+        int u, v, a, b, tt;
+        for (int i = 0; i < m; i++) {
+            scanf("%d%d%d%d%d", &u, &v, &a, &b, &tt);
+            if (a >= tt) addEdge(u, v, a, b, tt);
+        }
+        printf("Case %d: %d\n", ++kase, Dijkstra(s, t));
+    }    
+    return 0;
+}

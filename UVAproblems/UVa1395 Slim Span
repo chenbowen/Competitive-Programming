@@ -1,0 +1,56 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+
+using namespace std;
+const int maxn = 100 + 5, maxnm = 5000 + 5;
+int n, m, p[maxn];
+
+struct Edge {
+    int u, v, w;
+    bool operator < (const Edge &rhs) const {
+        if (w != rhs.w) return w < rhs.w;
+        if (u != rhs.u) return u < rhs.u;
+        return v < rhs.v;
+    }
+}G[maxnm];
+
+int find(int x) {
+    return p[x] == x ? x : p[x] = find(p[x]);
+}
+
+int Kruskal(int l, int r) {
+    int cnt = 0, maxw = -1;
+    for (int i = 1; i <= n; i++) p[i] = i;
+    for (int i = l; i <= r; i++) {
+        int x = find(G[i].u), y = find(G[i].v);
+        if (x != y) {
+            p[x] = y;
+            maxw = max(maxw, G[i].w);
+            cnt++;
+        }
+    }
+    if (cnt == n - 1) return maxw - G[l].w;
+    return 5000000;
+}
+
+int main() {
+    while (scanf("%d%d", &n, &m) == 2 && n) {
+        for (int i = 0; i < m; i++) 
+            scanf("%d%d%d", &G[i].u, &G[i].v, &G[i].w);
+        sort(G, G + m);
+        int ans = 5000000;
+        for (int i = 0; i < m; i++) {
+            int temp = 5000000;
+            for (int j = i + n - 2; j < m; j++) {
+                if (temp != 5000000 || G[j].w - G[i].w > ans) break;
+                temp = min(temp, Kruskal(i, j));
+            }
+            ans = min(ans, temp);
+        }
+        if (ans == 5000000) printf("-1\n");
+        else printf("%d\n", ans);
+    }
+    return 0;
+}

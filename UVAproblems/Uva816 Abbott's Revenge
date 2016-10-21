@@ -1,0 +1,98 @@
+#include <iostream>
+#include <cstdio>
+#include <map>
+#include <stack>
+#include <queue>
+#include <cstring>
+
+using namespace std;
+const int MAXN = 10;
+char name[25], sd;
+map<char, pair<int, int> > d_p;
+map<string, char> turn;
+string ar[MAXN][MAXN][10];
+int len[MAXN][MAXN], sx, sy, tx, ty;
+
+bool read() {
+    int x, y; char sss[1000];
+    if (scanf("%s%d%d%s%d%d", name, &sx, &sy, sss, &tx, &ty) != 6) return false;
+    memset(len, 0, sizeof(len));
+    sd = sss[strlen(sss) - 1];
+    char ts[300] = {sd, 'F', '\0'};
+    ar[sx][sy][0] = string(ts); len[sx][sy] = 1;
+    while (scanf("%d", &x) && x) {
+        string s;
+        scanf("%d", &y);
+        int i = 0;
+        while (cin >> s && s != "*") ar[x][y][i++] = s;
+        len[x][y] = i;
+    }
+    return true;
+}
+
+struct Node {
+    int x, y;
+    char d;
+    Node* next;
+    Node(int x, int y, char d): x(x), y(y), d(d), next(nullptr) {}
+};
+
+vector<Node*> memory;
+
+void del_m() {
+    int size = memory.size();
+    for (int i = 0; i < size; i++) 
+        delete memory[i];
+    memory.clear();
+}
+
+int main() {
+    d_p['N'] = make_pair(-1, 0); d_p['S'] = make_pair(1, 0);
+    d_p['W'] = make_pair(0, -1); d_p['E'] = make_pair(0, 1);
+    turn["NL"] = turn["WF"] = turn["SR"] = 'W';
+    turn["EL"] = turn["NF"] = turn["WR"] = 'N';
+    turn["SL"] = turn["EF"] = turn["NR"] = 'E';
+    turn["WL"] = turn["SF"] = turn["ER"] = 'S';
+    
+    while (read()) {
+        queue<Node*> bfs; Node* target = nullptr;
+        bfs.push(new Node(sx, sy, sd));
+        while (!bfs.empty()) {
+            Node *cur = bfs.front();
+            bfs.pop();
+            memory.push_back(cur);
+            if (cur->x == tx && cur->y == ty) { target = cur; break;}
+            for (int i = 0; i < len[cur->x][cur->y]; i++) { 
+                if (ar[cur->x][cur->y][i][0] == cur->d) 
+                    for (int j = 1; j < ar[cur->x][cur->y][i].size(); j++) {
+                        if (ar[cur->x][cur->y][i][j] == 'B') continue;
+                        char ts[300] = {cur->d, ar[cur->x][cur->y][i][j], '\0'};
+                        char nd = turn[string(ts)];
+                        int nx = cur->x + d_p[nd].first, ny = cur->y + d_p[nd].second;
+                        if (nx > 0 && ny > 0 && nx < 10 && ny < 10) {
+                            Node *nextn = new Node(nx, ny, nd); 
+                            nextn->next = cur;
+                            bfs.push(nextn);
+                            ar[cur->x][cur->y][i][j] = 'B';
+                        }
+                    }
+            }
+        }
+        printf("%s", name);
+        if (target == nullptr) { printf("\n  No Solution Possible\n"); del_m(); continue; } 
+        stack<pair<int, int> > path;
+        while (target != nullptr) {
+            path.push(make_pair(target->x, target->y));
+            target = target->next;
+        }
+        int i = 0;
+        while (!path.empty()) {
+            if (i++ % 10 == 0) printf("\n ");
+            printf(" (%d,%d)", path.top().first, path.top().second);
+            path.pop();
+        }
+        printf("\n");
+        del_m();
+    }
+    return 0;
+}

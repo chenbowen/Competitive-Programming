@@ -1,0 +1,116 @@
+#include<cstdio>
+#include<cstring>
+#include<queue>
+#include<set>
+#include<algorithm>
+#include<vector>
+
+using namespace std;
+const int maxn = 100 + 10, INF = 1<<30;
+int n, m, deg[maxn], a[maxn], p[maxn];
+bool f[maxn][6*maxn];
+
+struct Edge {
+    int u, v, cap, flow;
+    Edge(int u = 0, int v = 0, int cap = 0, int flow = 0): u(u), v(v), cap(cap), flow(flow) {}
+};
+vector<Edge> edges;
+vector<int> G[maxn];
+vector<int> G2[maxn];
+
+int MaxFlow(int s, int t) {
+    int flow = 0;
+    for (;;) {
+        memset(a, 0, sizeof(a));
+        queue<int> q;
+        q.push(s);
+        a[s] = INF; p[s] = s;
+        while (!q.empty()) {
+            int u = q.front(); q.pop();
+            for (int i = 0; i < G[u].size(); i++) {
+                Edge &e = edges[G[u][i]];
+                if (e.cap > e.flow && !a[e.v]) {
+                    p[e.v] = G[u][i];
+                    a[e.v] = min(a[u], e.cap - e.flow);
+                    q.push(e.v);
+                }
+            }
+            if (a[t]) break;
+        }
+        if (!a[t]) break;
+        flow += a[t];
+        for (int u = t; u != s; u = edges[p[u]].u) {
+            edges[p[u]].flow += a[t];
+            edges[p[u]^1].flow -= a[t];
+        }
+    }
+    return flow;
+}
+
+void addEdge(int u, int v, int cap) {
+    edges.push_back(Edge(u, v, cap));
+    edges.push_back(Edge(v, u, 0));
+    G[u].push_back(edges.size() - 2);
+    G[v].push_back(edges.size() - 1);
+}
+
+void dfs(vector<int> &path, int u) {
+    for (int j = 0; j < G2[u].size(); j++) if (!f[u][j]) {
+        f[u][j] = true;
+        dfs(path, G2[u][j]);
+        path.push_back(G2[u][j]);
+    }
+}
+
+void print_euler() {
+    for (int u = 1; u <= n; u++)
+        for (int i = 0; i < G[u].size(); i++) {
+            Edge &e = edges[G[u][i]];
+            if (e.v == 0 || e.v == n + 1 || e.cap == 0) continue;
+            if (e.flow == e.cap) G2[e.v].push_back(e.u);
+            else G2[e.u].push_back(e.v);
+        }
+    vector<int> path;
+    dfs(path, 1);
+    printf("1");
+    for (int i = path.size() - 1; i >= 0; i--) printf(" %d", path[i]);
+    printf("\n");
+}
+
+void init() {
+    memset(deg, 0, sizeof(deg));
+    memset(f, 0, sizeof(f));
+    edges.clear();
+    for (int i = 0; i < maxn; i++) { G[i].clear(); G2[i].clear();}
+}
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while (T--) {
+        init();
+        scanf("%d%d", &n, &m);
+        int u, v;
+        char di[10];
+        for (int i = 0; i < m; i++) {
+            scanf("%d%d%s", &u, &v, di);
+            deg[u]--; deg[v]++;
+            if (di[0] == 'U') addEdge(u, v, 1);
+            else G2[u].push_back(v);
+        }
+        bool ok = true;
+        for (int i = 1; i <= n; i++) if (deg[i] % 2 != 0) ok = false;
+        if (ok) {
+            int sum = 0;
+            for (int i = 1; i <= n; i++) {
+                if (deg[i] < 0) addEdge(0, i, -deg[i] / 2);
+                if (deg[i] > 0) { addEdge(i, n + 1, deg[i] / 2); sum += deg[i] / 2;}
+            }
+            if (MaxFlow(0, n + 1) != sum) ok = false;
+        }
+        if (!ok) printf("No euler circuit exist\n");
+        else print_euler();
+        if (T) printf("\n");
+    }
+    return 0;
+}

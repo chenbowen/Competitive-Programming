@@ -1,0 +1,55 @@
+#include <iostream>
+#include <cstdio>
+#include <map>
+#include <set>
+#include <cstring>
+using namespace std;
+
+const int MAXN = 27 * 2;
+
+bool G[MAXN][MAXN], f[MAXN] ,ok;
+
+int ID(char c, char sign) {
+    return (c - 'A') * 2 + (sign == '+' ? 1 : 0);
+}
+
+void link(char c1, char c2, char a1, char a2) {
+    if (c1 == '0' || a1 == '0') return;
+    int u = ID(c1, c2), v = ID(a1, a2 == '+' ? '-' : '+');
+    G[u][v] = 1;
+}
+
+void dfs(int v) {
+    f[v] = 1; 
+    for (int i = 0; i < MAXN; i++) {
+        if (!ok && G[v][i]) {
+            if (f[i]) { ok = 1; return;}
+            dfs(i);
+        }
+    }
+    f[v] = 0;
+}
+
+int main() {
+    freopen("in", "r", stdin);
+    //freopen("out", "w", stdout);
+    int n;
+    while (scanf("%d", &n) == 1 && n) {
+        ok = 0;
+        memset(f, 0, sizeof(f));
+        memset(G, 0, sizeof(G));
+        char s[10];
+        while(n--) {
+            scanf("%s", s);
+            for (int i = 0; i < 4; i++) 
+                for (int j = 0; j < 4; j++) if (i != j) 
+                    link(s[i * 2], s[i * 2 + 1], s[j * 2], s[j * 2 + 1]);
+        }
+        for (int i = 0; i < MAXN; i++) 
+            if (ok) break;
+            else dfs(i);
+        if (!ok) printf("bounded\n");
+        else printf("unbounded\n");
+    }
+    return 0;
+}

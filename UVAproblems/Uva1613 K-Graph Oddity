@@ -1,0 +1,58 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <queue>
+#include <set>
+using namespace std;
+const int maxn = 9999 + 3;
+int n, m, color[maxn], k, cnt;
+set<int> g[maxn];
+bool color_left[maxn];
+
+void bfs() {
+    bool f[maxn];
+    memset(f, 0, sizeof(f));
+    f[1] = 1;
+    queue<int> q;
+    q.push(1);
+    while (!q.empty()) {
+        int cur = q.front(); q.pop();
+        set<int> &neighbor = g[cur];
+        cnt = 0;
+        memset(color_left, 1, 4 * k + 4);
+        for (auto i : neighbor) if (color[i]) color_left[color[i]] = 0; 
+        for (int i = 1; i <= k; i++) if (color_left[i]) {
+            color[cur] = i;
+            break;
+        }
+        for (auto i: neighbor) if (!f[i]) {
+            f[i] = 1;
+            q.push(i);
+        } 
+    }
+}
+
+
+int main() {
+    int t = 0;
+    while (scanf("%d%d", &n, &m) == 2 && n && m) {
+        if (++t > 1) printf("\n");
+        int a, b;
+        k = 0;
+        for (int i = 1; i <= n; i++) g[i].clear();
+        memset(color, 0, sizeof(color));
+        for (int i = 0; i < m; i++) {
+            scanf("%d%d", &a, &b);
+            if (a != b) {
+                g[a].insert(b); g[b].insert(a);
+                k = max(k, int(g[b].size()));
+                k = max(k, int(g[a].size()));
+            }
+        }
+        if (k % 2 == 0) k++;
+        bfs();
+        printf("%d\n", k);
+        for (int i = 1; i <= n; i++) printf("%d\n", color[i]);
+    }
+    return 0;
+}

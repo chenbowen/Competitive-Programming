@@ -1,0 +1,33 @@
+#include <cstdio>
+#include <algorithm>
+using namespace std;
+
+const int MAXN = 4096 + 10;
+char s1[MAXN], s2[MAXN];
+int cnt, it1, it2, px[] = {1024, 256, 64, 16, 4, 1};
+int dfs(int &index, const char *str, int depth) {
+    int local_sum = 0;
+    if (str[index - 1] != 'p') return str[index - 1] == 'e' ? 0 : px[depth];
+    for (int i = 0; i < 4; i++) 
+        local_sum += dfs(++index, str, depth + 1);
+    return local_sum;
+}
+
+void solve(int depth) {
+    if (s1[it1] == 'p' && s2[it2] == 'p') {
+        it1++; it2++;
+        for (int i = 0; i < 4; i++) solve(depth + 1);
+    }
+    else cnt += max(dfs(++it1, s1, depth), dfs(++it2, s2, depth));
+}
+
+int main() {
+    int T; scanf("%d", &T); 
+    while (T--) {
+        cnt = it1 = it2 = 0;
+        scanf("%s", s1); scanf("%s", s2);
+        solve(0);
+        printf("There are %d black pixels.\n", cnt);
+    }
+    return 0;
+}

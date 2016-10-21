@@ -1,0 +1,46 @@
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+#include<map>
+
+using namespace std;
+const int maxn = 100 + 5, INF = 1000000000;
+int n, idx, d[maxn][maxn];
+map<int, int> id;
+
+void floyd() {
+    for (int i = 0; i < n; i++) d[i][i] = 0;
+    
+    for (int k = 0; k < n; k++)
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                d[i][j] = min(d[i][j], d[i][k] + d[k][j]);
+}
+
+
+int main() {
+    int a, b, kase = 0;
+    while (scanf("%d%d", &a, &b) == 2 && a) {
+        id.clear();
+        idx = 0;
+        for (int i = 0; i < maxn; i++) for (int j = 0; j < maxn; j++) d[i][j] = INF;
+        id[a] = idx++;
+        id[b] = idx++;
+        d[id[a]][id[b]] = 1;
+        while (scanf("%d%d", &a, &b) == 2 && a) {
+            if (id.count(a) == 0) id[a] = idx++;
+            if (id.count(b) == 0) id[b] = idx++;
+            d[id[a]][id[b]] = 1;
+        }
+        n = id.size();
+        floyd();
+        int ans = 0, cnt = 0;
+        for (int i = 0; i < n; i++) for (int j = 0; j < n; j++) 
+            if (i != j && d[i][j] != INF) {
+                ans += d[i][j];
+                cnt++;
+            }
+        printf("Case %d: average length between pages = %.3f clicks\n", ++kase, double(ans) / cnt);
+    }
+    return 0;
+}

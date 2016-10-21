@@ -1,0 +1,45 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+
+using namespace std;
+const int maxm = 12, maxn = 130;
+const int inf = maxm;
+int n, m, st[maxn], d[1<<maxm][1<<maxm], cnt[1<<maxm][1<<maxm];
+char s[maxm + 1];
+
+int dp(int s1, int a) {
+    int &ans = d[s1][a];
+    if (cnt[s1][a] == 1) ans = 0;
+    if (ans != -1) return ans;
+    ans = inf;
+    for (int i = 0; i < m; i++) 
+        if (!(s1 & (1<<i)))
+        ans = min(ans, max(dp(s1^(1<<i), a), dp(s1^(1<<i), a^(1<<i))) + 1);
+    return ans;
+}
+
+int trans() {
+    int l = strlen(s), ans = 0;
+    for (int i = l - 1; i >= 0; i--) 
+        ans += ((s[i] - '0')<<(l - 1 - i));
+    return ans;
+}
+
+int main() {
+    while (scanf("%d%d", &m, &n) == 2 && m && n) {
+        memset(d, -1, sizeof(d));
+        memset(cnt, 0, sizeof(cnt));
+        for (int i = 0; i < n; i++) { 
+            scanf("%s", s); 
+            st[i] = trans(); 
+        }
+        int upper = 1<<m;
+        for (int i = 0; i < n; i++)
+            for (int s1 = 0; s1 < upper; s1++) 
+                cnt[s1][s1 & st[i]]++;
+        printf("%d\n", dp(0, 0));
+    }
+    return 0;
+}

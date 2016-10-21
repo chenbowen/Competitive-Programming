@@ -1,0 +1,44 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+#include<iostream>
+#include<vector>
+#include<sstream>
+
+using namespace std;
+const int maxn = 100 + 3, maxs = 8 + 1;
+const int inf = 1<<30, maxm = 20 + 2;
+int n, s, m, c[maxm+maxn], st[maxn+maxm];
+int d[maxm+maxn][1<<maxs][1<<maxs];
+
+int dp(int i, int s0, int s1, int s2) {
+    if (i == m+n) return s2 == ((1<<s) - 1) ? 0 : inf;
+    int &ans = d[i][s1][s2];
+    if (ans != -1) return ans;
+    ans = inf;
+    if (i >= m) ans = dp(i + 1, s0, s1, s2);
+    int m0 = st[i] & s0, m1 = st[i] & s1;
+    s0 ^= m0; s1 = (s1 ^ m1) | m0; s2 |= m1;
+    ans = min(ans, dp(i + 1, s0, s1, s2) + c[i]);
+    return ans;
+}
+
+
+int main() {
+    while (scanf("%d%d%d", &s, &m, &n) == 3 && s && m && n) {
+        getchar();
+        memset(st, 0, sizeof(st));
+        memset(d, -1, sizeof(d));
+        string data;
+        int a;
+        for (int i = 0; i < m + n; i++) {
+            getline(cin, data);
+            stringstream ss(data);
+            ss >> c[i];
+            while (ss >> a) st[i] |= 1<<(a - 1);
+        }
+        printf("%d\n", dp(0, (1<<s) - 1, 0, 0));
+    }    
+    return 0;
+}

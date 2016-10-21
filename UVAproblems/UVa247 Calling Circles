@@ -1,0 +1,60 @@
+#include<cstdio>
+#include<cstring>
+#include<map>
+#include<iostream>
+#include<algorithm>
+
+using namespace std;
+const int maxn = 25 + 2;
+int n, m, idx;
+bool f[maxn][maxn];
+map<string, int> ID;
+vector<string> names;
+
+void init() {
+    ID.clear();  names.clear();
+    memset(f, 0, sizeof(f));
+    idx = 0;
+}
+
+void Floyd() {
+    for (int i = 0; i < idx; i++) f[i][i] = 1;
+    for (int k = 0; k < n; k++)
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                f[i][j] = f[i][j] || (f[i][k] && f[k][j]);
+}
+
+int main() {
+    int kase = 0;
+    while ((cin >> n >> m) && n) {
+        init();
+        for (int i = 0; i < m; i++) {
+            string name1, name2;
+            cin >> name1 >> name2;
+            if (ID.count(name1) == 0) { ID[name1] = idx++; names.push_back(name1); }
+            if (ID.count(name2) == 0) { ID[name2] = idx++; names.push_back(name2); }
+            f[ID[name1]][ID[name2]] = 1;
+        }
+        Floyd();
+        vector<int> circles[maxn];
+        bool exist[maxn];
+        memset(exist, 1, sizeof(exist));
+        for (int i = 0; i < n; i++) if (exist[i]) {
+            vector<int> &circle = circles[i];
+            for (int j = 0; j < n; j++) if (exist[j] && f[i][j] && f[j][i]) {
+                circle.push_back(j);
+                exist[j] = false;
+            }
+        }
+        if (++kase > 1) cout << "\n";
+        cout << "Calling circles for data set " << kase << ":\n";
+        for (int i = 0; i < maxn; i++) if (!circles[i].empty()) {
+            cout << names[circles[i][0]];
+            for (int j = 1; j < circles[i].size(); j++) 
+                cout << ", " << names[circles[i][j]];
+            cout << "\n";
+        }
+    }
+    return 0;
+}

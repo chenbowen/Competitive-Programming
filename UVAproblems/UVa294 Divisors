@@ -1,0 +1,28 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while (T--) {
+        int L, U;
+        scanf("%d%d", &L, &U);
+        int ans = 1, num = L;
+        for (int i = L; i <= U; i++) {
+            int cnt = 2;
+            if (i == 1) cnt--;
+            int m = sqrt(i + 0.5);
+            for (int j = 2; j <= m; j++) if (i % j == 0) cnt += 2;
+            if (m * m == i) cnt--;
+            if (cnt > ans) {
+                ans = cnt;
+                num = i;
+            }
+        }
+        printf("Between %d and %d, %d has a maximum of %d divisors.\n", L, U, num, ans);
+    }
+    return 0;
+}

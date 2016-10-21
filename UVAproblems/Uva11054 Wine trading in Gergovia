@@ -1,0 +1,28 @@
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
+#include <algorithm>
+using namespace std;
+const int maxn = 100000 + 5;
+long long ans;
+int a[maxn], n;
+
+int main() {
+    while (scanf("%d", &n) == 1 && n) {
+        ans = 0;
+        for (int i = 0; i < n; i++) scanf("%d", &a[i]);
+        int i, j;
+        i = j = 0;
+        while (i < n) {
+            while (i < n && a[i] >= 0) i++;
+            while (j < n && a[j] <= 0) j++;
+            if (i == n) break;
+            int amount = min(a[j], -a[i]);
+            ans += abs(i - j) * amount;
+            a[j] -= amount;
+            a[i] += amount;
+        }
+        printf("%lld\n", ans);
+    }
+    return 0;
+}

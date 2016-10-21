@@ -1,0 +1,28 @@
+#include<cstdio>
+#include<iostream>
+#include<algorithm>
+#include<utility>
+#include<cstring>
+using namespace std;
+
+int l;
+
+int main() {
+    
+    scanf("%d", &l);
+    while (l--) {
+        int d, k, p = 1;
+        scanf("%d%d", &d, &k);
+        for (int i = 1; i < d; i++) {
+            p <<= 1;
+            if (k % 2 == 0) {
+                p++;
+                k >>= 1;
+            }
+            else k = (k + 1) >> 1;
+        }
+        printf("%d\n", p);
+    }
+    scanf("%d", &l);
+    return 0;
+}

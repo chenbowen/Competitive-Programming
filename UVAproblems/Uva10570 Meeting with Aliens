@@ -1,0 +1,39 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int maxn = 500 + 3;
+int n, a[maxn], b[maxn], temp[maxn], tempp[maxn];
+
+int check(int *arr, int *p) {
+    int min_cnt = maxn;
+    for (int k = 0; k < n; k++) {
+            memcpy(temp, arr, 4 * n + 4);
+            memcpy(tempp, p, 4 * n + 8);
+            int cnt = 0, _s;
+            for (int i = 0; i < n; i++) {
+                _s = (k + i) % n;
+                if (temp[_s] == i + 1) continue;
+                cnt++;
+                int oldp = temp[_s];
+                swap(temp[tempp[i + 1]], temp[_s]);
+                swap(tempp[i + 1], tempp[oldp]);
+            }
+            min_cnt = min(min_cnt, cnt);
+        }
+    return min_cnt;
+}
+
+int main() {
+    while (scanf("%d", &n) == 1 && n) {
+        int pa[maxn], pb[maxn];
+        for (int i = 0; i < n; i++) { 
+            scanf("%d", &a[i]); 
+            b[n - 1 - i] = a[i];
+            pa[a[i]] = i; pb[a[i]] = n - 1 - i;
+        }
+        int cnt1 = check(a, pa), cnt2 = check(b, pb);        
+        printf("%d\n", min(cnt1, cnt2));
+    }
+    return 0;
+}

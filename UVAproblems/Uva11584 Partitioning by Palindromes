@@ -1,0 +1,33 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+const int MAXN = 1000 + 3;
+int d[MAXN], n;
+bool hw[MAXN][MAXN];
+char s[MAXN];
+
+void dp_hw() {
+    memset(hw, 0, sizeof(hw));
+    for (int i = n - 1; i >= 0; i--)
+        for (int j = i; j < n; j++)
+            if (s[i] == s[j] && (j - i < 2 || hw[i + 1][j - 1])) hw[i][j] = 1;
+}
+
+int main() {
+    int T;
+    scanf("%d", &T);
+    while (T--) {
+        scanf("%s", s);
+        n = strlen(s);
+        dp_hw();
+        d[n] = 0;
+        for (int i = n - 1; i >= 0; i--) {
+            d[i] = (i == n - 1 ? 1 : d[i + 1] + 1);
+            for (int j = i + 1; j < n; j++) 
+                if (hw[i][j]) d[i] = min(d[i], d[j + 1] + 1);
+        }
+        printf("%d\n", d[0]);
+    }
+    return 0;
+}

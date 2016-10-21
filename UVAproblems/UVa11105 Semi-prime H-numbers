@@ -1,0 +1,51 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+const int maxn = 1000002;
+int ans[maxn];
+int h[maxn/2], primeh[maxn/2];
+bool fh[maxn], fprimeh[maxn];
+
+void init() {
+    int cnt = 0, cnt2 = 0;
+    for (int i = 0; 4 * i + 1 < maxn; i++) {
+        h[cnt++] = 4 * i + 1;
+        fh[4 * i + 1] = 1;
+    }
+    for (int i = 1; i < cnt; i++) {
+        int m = sqrt(h[i] + 0.5);
+        bool ok = true;
+        for (int j = 1; h[j] <= m; j++) 
+            if ((h[i] % h[j] == 0) && fh[h[i] / h[j]]) {
+                ok = false;
+                break;
+            }
+        if (ok) {
+            primeh[cnt2++] = h[i];
+            fprimeh[h[i]] = 1;
+        }
+        
+    }
+    for (int i = 1; i < cnt; i++) {
+        int m = sqrt(h[i] + 0.5);
+        int ok = 0;
+        for (int j = 0; primeh[j] <= m; j++) 
+            if (h[i] % primeh[j] == 0 && fprimeh[h[i] / primeh[j]]) {
+                ok = 1;
+                break;
+            }
+        for (int j = h[i - 1] + 1; j <= h[i]; j++) ans[j] = ans[h[i - 1]] + ok;
+    }
+}
+
+int main() {
+    init();
+    int n;
+    while (scanf("%d", &n) == 1 && n) {
+        printf("%d %d\n", n, ans[n]);
+    }
+    
+    return 0;
+}

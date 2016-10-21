@@ -1,0 +1,68 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+const int maxn = 20;
+int d[maxn][maxn];
+
+void init() {
+    int t = 1, special = 0;
+    for (int i = 1; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            d[i][j] = d[i - 1][j] * 10 + t;
+            if (j == 0 && i > 1) d[i][j] = d[i - 1][1] * 10 + t - special;
+        }
+        t *= 10;
+        special += t;
+    }
+}
+
+void count(int num, int *f) {
+    int temp = num, cnt = 0;
+    while (temp) {
+        cnt++;
+        temp /= 10;
+    }
+    int t = 1;
+    temp = num;
+    for (int i = 0; i < cnt; i++) {
+        int n = temp % 10;
+        if (i == 0) 
+            for (int j = 0; j <= n; j++) f[j]++;
+        else {
+            for (int j = 1; j < n; j++) f[j] += t;
+            if (i == cnt - 1)
+                f[0] += d[i][0] + (n - 1) * d[i][1];
+            else if (n > 0)
+                f[0] += n * d[i][1] + t;
+            for (int j = 1; j < 10; j++) f[j] += n * d[i][1];
+            f[n] += num % t + 1;
+        }
+        t *= 10;
+        temp /= 10;
+    }
+}
+
+int main() {
+    init();
+    int a, b;
+    while (scanf("%d%d", &a, &b) == 2 && a && b) {
+        if (a > b) swap(a, b);
+        int f1[maxn], f2[maxn], f3[maxn];
+        memset(f1, 0, sizeof(f1));
+        memset(f2, 0, sizeof(f2));
+        count(a, f1);
+        count(b, f2);
+        for (int i = 0; i < 10; i++) f3[i] = f2[i] - f1[i];
+        while (a) {
+            f3[a%10]++;
+            a /= 10;
+        }
+        printf("%d", f3[0]);
+        for (int i = 1; i < 10; i++) 
+            printf(" %d", f3[i]);
+        putchar('\n');   
+    }
+    return 0;
+}

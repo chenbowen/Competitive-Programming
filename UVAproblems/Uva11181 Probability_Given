@@ -1,0 +1,45 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cmath>
+#include<cstring>
+#include<algorithm>
+using namespace std;
+const int maxn = 20 + 2;
+const double eps = 1e-8;
+int n, r;
+double p[maxn], tot, np[maxn];
+bool f[maxn];
+
+void dfs(int cur, int num) {
+    if (num == r) {
+        double ans = 1.0;
+        for (int i = 0; i < n; i++) {
+            if (f[i]) ans *= p[i];
+            else ans *= (1.0 - p[i]);
+        }
+        for (int i = 0; i < n; i++) if (f[i])
+            np[i] += ans;
+        tot += ans;
+        return;
+    }
+    if (cur >= n) return;
+    f[cur] = 1;
+    dfs(cur + 1, num + 1);
+    f[cur] = 0;
+    dfs(cur + 1, num);
+    
+}
+
+int main() {
+    int kase = 0;
+    while (scanf("%d%d", &n, &r) == 2 && (fabs(n) > eps)) {
+        tot = 0;
+        memset(f, 0, sizeof(f));
+        fill(np, np + maxn, 0.0);
+        for (int i = 0; i < n; i++) scanf("%lf", &p[i]);
+        dfs(0, 0);
+        printf("Case %d:\n", ++kase);
+        for (int i = 0; i < n; i++) printf("%.6f\n", np[i] / tot);
+    }
+    return 0;
+}

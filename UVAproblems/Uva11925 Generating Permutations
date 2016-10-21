@@ -1,0 +1,41 @@
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <deque>
+using namespace std;
+const int maxn = 300 + 3;
+int n, a, cnt;
+char order[maxn*maxn*2];
+deque<int> q;
+
+bool check() {
+    deque<int>::iterator pre = q.begin(), cur;
+    cur = pre;
+    cur++;
+    for (; cur != q.end(); cur++, pre++) if (*cur < *pre) return false;
+    return true;
+}
+
+int main() {
+    while (scanf("%d", &n) == 1 && n) {
+        q.clear();
+        cnt = 0;
+        for (int i = 0; i < n; i++) { scanf("%d", &a); q.push_back(a);}
+        while (!check()) {
+            deque<int>::iterator pre = q.begin(), cur = q.begin() + 1;
+            if (*pre < *cur || (*pre == n && *cur == 1)) {
+                q.push_front(q.back()); q.pop_back();
+                order[cnt++] = '2';
+            }
+            else {
+                int b = q.front(); q.pop_front();
+                int c = q.front(); q.pop_front();
+                q.push_front(b); q.push_front(c);
+                order[cnt++] = '1';
+            }
+        }
+        for (int i = cnt - 1; i >= 0; i--) putchar(order[i]);
+        putchar('\n');
+    }
+    return 0;
+}

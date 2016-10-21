@@ -1,0 +1,70 @@
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+#include<iostream>
+#include<queue>
+#include<vector>
+using namespace std;
+const int maxn = 20 + 1, maxm = 100 + 10;
+const int INF = 2147483647;
+int n, m, c[maxm], idx, d[1<<maxn];
+bool done[1<<maxn];
+vector<string> p1, p2;
+
+bool equal(string s1, int st) {
+    for (int i = 0; i < n; i++) {
+        if (s1[i] == '+' && !(st & (1<<i))) return false;
+        if (s1[i] == '-' && (st & (1<<i))) return false;
+    }
+    return true;
+}
+
+struct HeapNode {
+    int st, w;
+    HeapNode(int st, int w): st(st), w(w) {}
+    bool operator < (const HeapNode &rhs) const {
+        return w > rhs.w;
+    }
+};
+
+void dijkstra() {
+    for (int i = 0; i < (1<<n); i++) { d[i] = INF; done[i] = false;}
+    priority_queue<HeapNode> q;
+    q.push(HeapNode((1<<n) - 1, 0));
+    d[(1<<n) - 1] = 0;
+    while (!q.empty()) {
+        HeapNode cur = q.top(); q.pop();
+        if (cur.st == 0) return;
+        if (done[cur.st]) continue;
+        done[cur.st] = true;
+        for (int i = 0; i < m; i++) if (equal(p1[i], cur.st)) {
+            HeapNode v(cur.st, cur.w + c[i]);
+            for (int j = 0; j < n; j++)  {
+                if (p2[i][j] == '+') v.st |= (1<<j);
+                else if (p2[i][j] == '-') v.st &= ~(1<<j);
+            }
+            if (d[v.st] > v.w) {
+                d[v.st] = v.w;
+                q.push(v);
+            }
+        }
+    }
+}
+
+int main() {
+    int kase = 0;
+    while ((cin >> n >> m) && n) {
+        p1.clear(); p2.clear();
+        string s1, s2;
+        for (int i = 0; i < m; i++) {
+            cin >> c[i] >> s1 >> s2;
+            p1.push_back(s1); p2.push_back(s2);
+        }
+        dijkstra();
+        cout << "Product " << ++kase << "\n";
+        if (d[0] != INF) 
+            cout << "Fastest sequence takes " << d[0] << " seconds.\n\n";
+        else cout << "Bugs cannot be fixed.\n\n";
+    }
+    return 0;
+}

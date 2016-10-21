@@ -1,0 +1,22 @@
+#include <cstdio>
+#include <cstring>
+#include <queue>
+#include <functional>
+using namespace std;
+int N;
+
+int main() {
+    while (scanf("%d", &N) == 1 && N) {
+        priority_queue<int, vector<int>, greater<int> > q;
+        int ans = 0, k;
+        for (int i = 0; i < N; i++) { scanf("%d", &k); q.push(k);}
+        while (q.size() > 1) {
+            int a = q.top(); q.pop();
+            int b = q.top(); q.pop();
+            ans += a + b;
+            q.push(a + b);
+        }
+        printf("%d\n", ans);
+    }
+    return 0;
+}

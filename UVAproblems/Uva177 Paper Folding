@@ -1,0 +1,97 @@
+#include <cstdio>
+#include <cstring>
+#include <utility>
+#include <cstdlib>
+#include <set>
+using namespace std;
+const int MAXN = (1<<14) + 5;
+int N, idx, w, h;
+
+struct Node {
+    int x, y;
+    Node(int x = 0, int y = 0): x(x), y(y) {}
+    bool operator == (const Node &lhs) const {
+        return lhs.x == x && lhs.y == y;
+    }
+    bool operator < (const Node &lhs) const {
+        return x < lhs.x || (x == lhs.x && y < lhs.y);
+    }
+}G[MAXN];
+
+void fold () {
+    for (int i = 0; i < idx; i++) G[i + idx] = Node(G[i].y, -G[i].x);
+    int dx = G[idx - 1].x - G[(idx << 1) - 1].x;
+    int dy = G[idx - 1].y - G[(idx << 1) - 1].y;
+    for (int i = idx; i < idx << 1; i++) G[i].x += dx, G[i].y += dy;
+    for (int i = 0; i < (idx-1) >> 1; i++) swap(G[i + idx], G[(idx << 1)- i - 2]);
+    idx = idx * 2 - 1;
+}
+
+void normalize() {
+    int min_x = MAXN, min_y = MAXN;
+    for (int i = 0; i < idx; i++) {
+        if (min_x > G[i].x) min_x = G[i].x;
+        if (min_y > G[i].y) min_y = G[i].y;
+    }
+    min_x = min_x > 0 ? min_x : -min_x;
+    min_y = min_y > 0 ? min_y : -min_y;
+    w = h = -1;
+    for (int i = 0; i < idx; i++) { 
+        G[i].x += min_x, G[i].y += min_y;
+        if (w < G[i].x) w = G[i].x;
+        if (h < G[i].y) h = G[i].y;
+    }
+    ++h, ++w;
+}
+
+void show() {
+    bool Graph[128][128];
+    memset(Graph, 0, sizeof(Graph));
+    set<Node> E[128][128];
+    for (int i = 0; i < 128; i++)
+        for (int j = 0; j < 128; j++) E[i][j].clear();
+    char board[130][260];
+    memset(board, ' ', sizeof(board));
+    for (int i = 0; i < idx; i++) {
+        int _from1 = i>0?h-1-G[i-1].y:-1, _from2 = i>0?G[i-1].x:-1;
+        int _to1 = i<idx?h-1-G[i+1].y:-1, _to2 = i<idx?G[i+1].x:-1;
+        E[h - 1 - G[i].y][G[i].x].insert(Node(_from1, _from2));
+        E[h - 1 - G[i].y][G[i].x].insert(Node(_to1, _to2));
+        Graph[h - 1 - G[i].y][G[i].x] = 1;
+    }
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++)
+            if (Graph[i][j]) {
+                if (i > 0 && Graph[i - 1][j] && E[i][j].count(Node(i-1,j))) board[i][j << 1] = '|';
+                if (Graph[i][j + 1] && E[i][j].count(Node(i,j+1))) board[i][(j << 1) + 1] = '_';
+            }
+    }
+    bool upper_empty = 1, _left_empty = 1;
+    for (int i = 0; i < w << 1; i++) if (board[0][i] != ' ') upper_empty = 0;
+    for (int i = 0; i < h; i++) if (board[i][0] != ' ') _left_empty = 0;
+    int right_most[130];
+    for (int i = 0; i < h; i++) {
+        int j = (w << 1) - 1;
+        while (j != 0 && board[i][j] == ' ') j--;
+        right_most[i] = j;
+    }
+    for (int i = upper_empty?1:0; i < h; i++) {
+        for (int j = _left_empty?1:0; j <= right_most[i]; j++)
+            putchar(board[i][j]);
+        putchar('\n');
+    }
+}
+
+int main() {
+    int T = 0;
+    while (scanf("%d", &N) == 1 && N) {
+        G[0] = Node(0, 0);
+        G[1] = Node(1, 0);
+        idx = 2;
+        for (int i = 0; i < N; i++) fold();
+        normalize();
+        show();
+        printf("^\n");
+    }
+    return 0;
+}

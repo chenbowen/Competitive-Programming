@@ -1,0 +1,123 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <unordered_map>
+#include <algorithm>
+#include <utility>
+#include <vector>
+#include <set>
+#include <sstream>
+#include <cctype>
+
+using namespace std;
+
+unordered_map<string, set<pair<int, int> > > dict;
+
+int N, M;
+vector<vector<string> > passage;
+vector<string> parseword(string word) {
+    vector<string> words;
+    int i = 0, size = word.size();
+    while (i < size) {
+        while (i < size && !isalpha(word[i])) i++;
+        int r = 1;
+        while (r < size && isalpha(word[r + i])) r++;
+        string s = word.substr(i, r);
+        for (int j = 0; j < s.size(); j++)
+            s[j] = tolower(s[j]);
+        words.push_back(s);
+        i += r;
+    }
+    return words;
+}
+
+int main() {
+    freopen("in", "r", stdin);
+    freopen("out", "w", stdout);
+    string s;
+    scanf("%d ", &N);
+    for (int i = 0; i < N; i++) {
+        int line = 0;
+        vector<string> lines;
+        while (getline(cin, s) && s != "**********") {
+            lines.push_back(s);
+            stringstream ss(s);
+            while (ss >> s) {
+                vector<string> words = parseword(s);
+                int wsize = words.size();
+                for (int k = 0; k < wsize; k++) 
+                    dict[words[k]].insert(make_pair(i, line));
+            }
+            line++;
+        }
+        passage.push_back(lines);
+    }
+    scanf("%d ", &M);
+    while (M--) {
+        getline(cin, s);
+        stringstream ss(s);
+        vector<string> query;
+        set<pair<int, int> > res;
+        int k = 0;
+        while (ss >> s) query.push_back(s);
+        if (query.size() == 1) {
+            int last_p = 0;
+            for (auto it: dict[query[0]]) {
+                if (k && last_p != it.first) printf("----------\n");
+                k++;
+                cout << passage[it.first][it.second] << endl;
+                last_p = it.first;
+            }
+        }
+        else if (query.size() == 2) {
+            bool rec[110];
+            memset(rec, 0, sizeof(rec));
+            for (auto it: dict[query[1]]) rec[it.first] = 1;
+            int num = 0;
+            for (k = 0; k < N; k++) {
+                if (!rec[k]) {
+                    if (num++) printf("----------\n");
+                    int size = passage[k].size();
+                    for (int z = 0; z < size; z++)
+                        cout << passage[k][z] << endl;
+                }
+            }
+            k = num;
+        }
+        else if (query.size() == 3) {
+            set<pair<int, int> > left = dict[query[0]], right = dict[query[2]];
+            if (query[1] == "OR") {
+                res = left;
+                for (auto it: right) res.insert(it);
+            }
+            else {
+                int rec[110];
+                memset(rec, 0, sizeof(rec));
+                for (auto it: left) {
+                    if (!rec[it.first])
+                        for (auto jt: right) {
+                            if (it.first == jt.first) {
+                                rec[it.first] = 1; 
+                                res.insert(it);
+                                break;
+                            }
+                        }
+                    else res.insert(it);
+                }
+                for (auto it: right) if (rec[it.first]) res.insert(it);     
+
+            }
+            int last_p = 0;
+            for (auto it: res) {
+                if (k && it.first != last_p) printf("----------\n");
+                cout << passage[it.first][it.second] << endl;
+                last_p = it.first;
+                k++;
+            }
+        }
+        if (!k) printf("Sorry, I found nothing.\n");
+        printf("==========\n");
+    }
+    return 0;
+}
+

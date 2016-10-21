@@ -1,0 +1,81 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <ctime>
+#include <unordered_map>
+#include <algorithm>
+#include <utility>
+#include <vector>
+#include <cctype>
+
+using namespace std;
+
+struct Array {
+    int size;
+    Array(int num = 0):size(num) {}
+    unordered_map<int, int> value;
+};
+
+unordered_map<string, Array> arr;
+bool bug;
+
+int get_value(string s) {
+    int it = s.find("]");
+    if (it == string::npos) return stoi(s);
+    it--;
+    while (isdigit(s[it])) it--;
+    int index = stoi(s.substr(it + 1, s.find("]")));
+    int rend = it--;
+    while (it >= 0) {
+        while (it >= 0 && isalpha(s[it])) it--;
+        string name = s.substr(it + 1, rend - it - 1);
+        rend = it--;
+        if (!arr.count(name) || arr[name].size <= index || !arr[name].value.count(index)) return -1;
+        index = arr[name].value[index];
+    }
+    return index;
+}
+
+
+int main() {
+    string s;
+    while ((cin >> s) && s != ".") {
+        int t = 1;
+        bug = 0;
+        arr.clear();
+        do {
+            if (bug) continue;
+            int eq = s.find("=");
+            if (eq == string::npos) {
+                int namep = s.find("[");
+                string name = s.substr(0, namep);
+                int l = stoi(s.substr(namep + 1, s.find("]")));
+                if (l > 2147483647) { bug = 1; printf("%d\n", t); continue;}
+                arr[name] = Array(l);                
+            }
+            else {
+                
+                string left = s.substr(0, eq), right = s.substr(eq + 1);
+                int right_value;
+                string lname = left.substr(0, left.find("["));
+                if (!arr.count(lname)) { bug = 1; printf("%d\n", t); continue;}
+                int l_index = get_value(left.substr(left.find("[") + 1, left.size() - 2 - left.find("[")));
+                if (l_index == -1 || arr[lname].size <= l_index) {
+                    bug = 1; 
+                    printf("%d\n", t); 
+                    continue;
+                }
+                int r_index = get_value(right);
+                if (r_index == -1) { 
+                    bug = 1; 
+                    printf("%d\n", t); 
+                    continue;
+                }
+                arr[lname].value[l_index] = r_index;
+            }
+            t++;
+        } while((cin >> s) && s != ".") ;
+        if (bug == 0) printf("0\n");
+    }
+    return 0;
+}

@@ -1,0 +1,48 @@
+#include <cstdio>
+#include <cstring>
+#include <sstream>
+#include <iostream>
+#include <climits>
+using namespace std;
+
+const int MAXN = 2000 + 10;
+const int MAXC = 200 + 10;
+int input[MAXN], c[MAXC], n, l, r, it;
+int read() {
+    string s;    
+    int in; n = it = 0;
+    if (!getline(cin, s)) return 0;
+    if (s == "-1") return 2;
+    stringstream ss(s);
+    while (ss >> in) input[n++] = in;
+    return 1;
+}
+
+void solve(int col) {
+    it++;
+    if (input[it - 1] == -1 || it > n) return; 
+    c[(col + MAXC) % MAXC] += input[it - 1];
+    if (l > col) l = col;
+    if (r < col) r = col;
+    solve(col - 1);
+    solve(col + 1);
+}
+
+int main() {
+    int t = 0, f;
+    while ((f = read())) {
+        if (f == 2) continue;
+        memset(c, 0, sizeof(c));
+        l = MAXC, r = INT_MIN;
+        solve(0);
+        printf("Case %d:\n", ++t);
+        int i = (l + MAXC) % MAXC;
+        printf("%d", c[i++]);
+        for (; i != r + 1; i++) {
+            if (i == MAXC) i = 0;
+            printf(" %d", c[i]);
+        }
+        printf("\n\n");
+    }
+    return 0;
+}

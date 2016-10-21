@@ -1,0 +1,85 @@
+#include<cstdio>
+#include<cstring>
+#include<queue>
+#include<algorithm>
+#include<vector>
+
+using namespace std;
+typedef long long LL;
+const int maxn = 2000 + 10, maxm = 20000 + 10;
+const int INF = 2147483647;
+int m, n, a[maxn], p[maxn], d[maxn];
+bool inq[maxn];
+
+struct Edge {
+    int u, v, w, cap, flow;
+    Edge(int u = 0, int v = 0, int w = 0, int cap = 0, int flow = 0): u(u), v(v), w(w), cap(cap), flow(flow) {}
+};
+vector<Edge> edges;
+vector<int> G[maxn];
+
+void addEdge(int u, int v, int w) {
+    edges.push_back(Edge(u, v, w, 1));
+    edges.push_back(Edge(v, u, -w));
+    G[u].push_back(edges.size() - 2);
+    G[v].push_back(edges.size() - 1);
+}
+
+bool spfa(int s, int t, int &flow, LL &cost) {
+    for (int i = 1; i <= 2*n; i++) d[i] = INF;
+    memset(inq, 0, sizeof(inq));
+    queue<int> q;
+    q.push(s);
+    d[s] = 0; p[s] = 0;
+    a[s] = INF;
+    while (!q.empty()) {
+        int u = q.front(); q.pop();
+        inq[u] = false;
+        for (int i = 0; i < G[u].size(); i++) {
+            Edge &e = edges[G[u][i]];
+            if (e.cap > e.flow && d[e.v] > d[u] + e.w) {
+                d[e.v] = d[u] + e.w;
+                a[e.v] = min(a[u], e.cap - e.flow);
+                p[e.v] = G[u][i];
+                if (!inq[e.v]) {q.push(e.v); inq[e.v] = true;}
+            }
+        }
+    }
+    if (d[t] == INF) return false;
+    flow += a[t];
+    cost += LL(a[t]) * d[t];
+    for (int u = t; u != s; u = edges[p[u]].u) {
+        edges[p[u]].flow += a[t];
+        edges[p[u]^1].flow -= a[t];
+    }
+    return true;
+}
+
+LL MincostMaxFlow(int s, int t) {
+    int flow = 0;
+    LL cost = 0;
+    while (flow < 2 && spfa(s, t, flow, cost));
+    return cost;
+}
+
+void init() {
+    edges.clear();
+    for (int i = 0; i < maxn; i++) G[i].clear();
+}
+
+int main() {
+    while (scanf("%d%d", &n, &m) == 2) {
+        init();
+        int u, v, w;
+        for (int i = 2; i < n; i++) addEdge(i, n + i, 0);
+        for (int i = 0; i < m; i++) {
+            scanf("%d%d%d", &u, &v, &w);
+            if (u != 1)
+                u += n;
+            addEdge(u, v, w);
+        }
+        LL ans = MincostMaxFlow(1, n);
+        printf("%lld\n", ans);
+    }
+    return 0;
+}

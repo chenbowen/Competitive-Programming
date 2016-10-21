@@ -1,0 +1,28 @@
+#include<cstdlib>
+#include<cstdio>
+#include<cmath>
+using namespace std;
+const int maxn = 2e5 + 3;
+long double F[2*maxn + 1];
+
+long double logc(int m, int n) {        
+    return F[m] - F[n] - F[m - n];
+}
+
+int main() {
+    F[0] = 0;
+    for (int i = 2; i <= maxn; i++) 
+        F[i] = F[i - 1] + log(i);
+    
+    int n, kase = 0;
+    double p;
+    while (scanf("%d%lf", &n, &p) == 2) {
+        long double ans = 0;
+        for (int i = 0; i <= n; i++) {
+            long double log_c = logc(2*n-i, n);
+            ans += i * (exp(log_c + (n+1)*log(p) + (n-i)*log(1-p)) + exp(log_c + (n+1)*log(1-p) + (n-i)*log(p)));
+        }
+        printf("Case %d: %.6llf\n", ++kase, ans);
+    }
+    return 0;
+}

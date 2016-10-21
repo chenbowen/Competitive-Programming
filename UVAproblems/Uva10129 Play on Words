@@ -1,0 +1,52 @@
+#include <iostream>
+#include <cstdio>
+#include <vector>
+#include <map>
+#include <set>
+#include <cstring>
+using namespace std;
+const int MAXN = 128 + 10;
+
+bool rec[MAXN][MAXN], f[MAXN], ok;
+set<char> node; 
+map<char, pair<int, int> > d;
+
+void dfs(char c) {
+    f[c] = 1;
+    for (auto it: node) if (!f[it] && (rec[c][it] || rec[it][c])) {
+        rec[c][it] = rec[it][c] = 0; dfs(it); }
+}
+
+int main() {
+    freopen("in", "r", stdin);
+    //freopen("out", "w", stdout);
+    int T, n;
+    scanf("%d", &T);
+    while (T--) {
+        memset(rec, 0, sizeof(rec));
+        memset(f, 0, sizeof(f));
+        node.clear(); ok = 1; d.clear();
+        string w;
+        scanf("%d", &n);
+        while (n--) {
+            cin >> w;
+            rec[w[0]][w[w.size() - 1]] = 1;
+            d[w[0]].second++; d[w[w.size() - 1]].first++;
+            node.insert(w[0]);
+        }
+
+        int startn = 0, endn = 0;
+        for (auto it: d) {
+            if (it.second.first == it.second.second) continue;
+            if (it.second.first - it.second.second == 1) endn++;
+            else if (it.second.second - it.second.first == 1) startn++;
+            else ok = 0;
+        }
+        if (!((!endn && !startn) || endn == 1 && startn == 1)) ok = 0;
+        if (ok) dfs(*node.begin());
+        for (auto it: node) if (!f[it]) { ok = 0; break; };
+        if (!ok) printf("The door cannot be opened.\n");
+        else printf("Ordering is possible.\n");   
+    }
+    return 0;
+}

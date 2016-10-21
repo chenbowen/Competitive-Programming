@@ -1,0 +1,80 @@
+#include<cstdio>
+#include<cstring>
+#include<queue>
+#include<algorithm>
+#include<vector>
+
+using namespace std;
+const int maxn = 120 + 10, INF = 100000;
+int n, m, a[maxn], p[maxn];
+bool done[maxn];
+
+struct Edge {
+    int u, v, cap, flow;
+    Edge(int u = 0, int v = 0, int cap = 0, int flow = 0): u(u), v(v), cap(cap), flow(flow) {}
+};
+vector<Edge> edges;
+vector<int> G[maxn];
+
+int MaxFlow(int s, int t) {
+    int flow = 0;
+    for (int i = 0; i < edges.size(); i++) edges[i].flow = 0;
+    for (;;) {
+        memset(done, 0 , sizeof(done));
+        memset(a, 0 , sizeof(a));
+        queue<int> q;
+        q.push(s);
+        p[s] = 0; a[s] = INF;
+        while (!q.empty()) {
+            int u = q.front(); q.pop();
+            if (done[u]) continue;
+            done[u] = true;
+            for (int i = 0; i < G[u].size(); i++) {
+                Edge &e = edges[G[u][i]];
+                if (!a[e.v] && e.cap > e.flow) {
+                    a[e.v] = min(e.cap - e.flow, a[u]);
+                    p[e.v] = G[u][i];
+                    q.push(e.v);
+                }
+            }
+            if (a[t]) break;
+        }
+        if (!a[t]) break;
+        flow += a[t];
+        for (int u = t; u != s; u = edges[p[u]].u) {
+            edges[p[u]].flow += a[t];
+            edges[p[u]^1].flow -= a[t];
+        }
+    }
+    return flow;
+}
+
+void addEdge(int u, int v, int cap) {
+    edges.push_back(Edge(u, v, cap));
+    edges.push_back(Edge(v, u, 0));
+    G[u].push_back(edges.size() - 2);
+    G[v].push_back(edges.size() - 1);
+}
+
+void init() {
+    edges.clear();
+    for (int i = 0; i < maxn; i++) G[i].clear();
+}
+
+int main() {
+    while (scanf("%d%d", &n, &m) == 2) {
+        int ans = INF, x, y;
+        init();
+        for (int i = 0; i < n; i++) addEdge(i, i+n, 1);
+        for (int i = 0; i < m; i++) {
+            scanf(" (%d,%d)", &x, &y);
+            addEdge(x+n, y, INF);
+            addEdge(y+n, x, INF);
+        }
+        for (int i = 1; i < n; i++) 
+            ans = min(ans, MaxFlow(n, i));
+        if (ans >= n) ans = n;
+        printf("%d\n", ans);
+    }
+    return 0;
+}
