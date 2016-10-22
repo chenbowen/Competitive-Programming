@@ -1,0 +1,75 @@
+---
+title: UVa - 524 Prime Ring Problem [2]
+categories:
+- apoc
+- 07-暴力求解法
+- 难度2
+date: 2016-10-22 11:15:27
+tags:
+- dfs and similar
+- math
+---
+# 链接
+[传送门](https://uva.onlinejudge.org/index.php?option=com_onlinejudge&Itemid=8&page=show_problem&problem=465)
+
+# 难度
+- 思考$1$
+- 实现$2$
+
+# 题意
+把$1,2,…,n$组成一个环，使得任意相邻两数和为素数。输出时从1开始逆时针排列。$n\leqslant16$
+
+# 思路
+回溯法;固定第一位为1,环就不会重复。
+
+# 代码
+```cpp
+const int N = 33;
+int n;
+bool isp[N], f[N];
+
+void dfs(int d, int *A) {
+	if (d == n) {
+		if (isp[A[d-1] + A[0]]) {
+			F(i, n-1) printf("%d ", A[i]);
+			printf("%d\n", A[n-1]);
+		}
+		return;
+	}
+	for(int i = 2; i <= n; i++) 
+		if (!f[i] && isp[i+A[d-1]]) {
+			f[i] = true;
+			A[d] = i;
+			dfs(d+1, A);
+			f[i] = false;
+		}
+}
+
+void init() {
+	MEM(isp, 1);
+	for (int i = 2; i < N; i++) {
+		if (isp[i]) 
+			for(int j = i+i; j < N; j += i) 
+				isp[j] = false;
+	}
+}
+
+int main() {
+#ifdef LOCAL
+    freopen("in", "r", stdin);
+    // freopen("out", "w", stdout);
+#endif
+	init();
+	int kase = 0;
+	while (s(n) == 1) {
+		if (++kase > 1) printf("\n");
+		printf("Case %d:\n", kase);
+		int a[N];
+		MEM(f, 0);
+		f[1] = true;
+		a[0] = 1;
+		dfs(1, a);
+	}
+	return 0;
+}
+```
