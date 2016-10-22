@@ -3,16 +3,16 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
-subtitle:
-description:
-author: John Doe
-language:
+title: Bowen
+subtitle: Competitive-Programming
+description: 那么努力还不是因为你平庸
+author: Bowen Chen
+language: zh-Hans
 timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://yoursite.com
+url: https://chenbowen.github.io/
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
@@ -63,7 +63,7 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: landscape
+theme: next
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
@@ -71,3 +71,15 @@ deploy:
   type: git
   repository: https://github.com/chenbowen/chenbowen.github.io.git
   branch: master
+
+#头像
+avatar: http://codeforces.com/userphoto/title/TooDifficuIt/photo.jpg
+
+#统计
+baidu_analytics: 253879edb07334fa123a30bd896ea141
+
+search:
+  path: search.xml
+  field: post
+  format: html
+  limit: 10000
