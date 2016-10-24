@@ -53,26 +53,58 @@ const double eps = 1e-9;
 #define LLD                         "%I64d"
 #endif
 #define sl(n)                       scanf(LLD,&(n))
+const int N = 30;
+int n, ans, a[N], f[N], ansp[N], node[N];
+bool G[N][N], vis[N], vis2[N];
+char s[200];
 
-const int N = 5002;
-const int hashsize = 1000003;
-int head[hashsize], next[hashsize];
-void init_lookup_table() {MEM(head, 0);}
-int hash(State& s) {
-	// 将状态转成整数
-	// ...
-	return v%hashsize;
-}
-bool try_to_insert(int s) {
-	int h = hash(st[s]);
-	int u = head[h];
-	while (u) {
-		// 判重
-		if (memcmp(st[u], st[s], sizeof(st[u])) == 0)
-			return false;
-		u = next[u];
+void dfs(int d, int k) {
+	if (d == n) {
+		if (ans > k) {
+			ans = k;
+			memcpy(ansp, a, sizeof(a));
+		}
+		return;
 	}
-	return true;
+	F(i, n) if (!vis[node[i]]) {
+		vis[node[i]] = true;
+		a[d] = node[i];
+		f[a[d]] = d;
+		MEM(vis2, 0);
+		F(j, d) if (G[a[d]][a[j]]) {
+			k = max(k, abs(f[a[j]] - f[a[d]]));
+			vis2[a[j]] = true;
+		}
+		int cnt = 0;
+		F(j, n) if (G[a[d]][node[j]] && !vis2[node[j]]) 
+			cnt++;
+		if (k < ans && cnt < ans) dfs(d+1, k);
+		f[a[d]] = INF;
+		vis[node[i]] = false;
+	}
+}
+
+void insert(int u) {
+	if (!vis[u]) {
+		node[n++] = u;
+		vis[u] = true;
+	}
+}
+
+void parse() {
+	n = 0;
+	int l = strlen(s), i = 0;
+	MEM(G, 0);
+	MEM(vis, 0);
+	do {
+		int u = s[i] - 'A'; i += 2;
+		insert(u);
+		while (i < l && s[i] != ';') {
+			insert(s[i]-'A');
+			G[s[i++] - 'A'][u] = G[u][s[i-1] - 'A'] = true;
+		}
+	} while(i++ < l);
+	sort(node, node+n);
 }
 
 int main() {
@@ -80,6 +112,14 @@ int main() {
     freopen("in", "r", stdin);
     // freopen("out", "w", stdout);
 #endif
-	
+	while (ss(s) && s[0] != '#') {
+		parse();
+		ans = INF;
+		MEM(vis, 0);
+		MEM(f, INF);
+		dfs(0, 0);
+		F(i, n) printf("%c ", ansp[i] + 'A');
+		printf("-> %d\n", ans);
+	}
 	return 0;
 }

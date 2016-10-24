@@ -1,6 +1,6 @@
 /**
  * @authors Bowen Chen (chenbowen9612@gmail.com)
- * @date    2016-10-22
+ * @date    2016-10-24
  */
 #include <iostream>
 #include <cstdio>
@@ -53,33 +53,61 @@ const double eps = 1e-9;
 #define LLD                         "%I64d"
 #endif
 #define sl(n)                       scanf(LLD,&(n))
+const int N = 201;
+int a[3], d;
+bool vis[N][N];
 
-const int N = 5002;
-const int hashsize = 1000003;
-int head[hashsize], next[hashsize];
-void init_lookup_table() {MEM(head, 0);}
-int hash(State& s) {
-	// 将状态转成整数
-	// ...
-	return v%hashsize;
-}
-bool try_to_insert(int s) {
-	int h = hash(st[s]);
-	int u = head[h];
-	while (u) {
-		// 判重
-		if (memcmp(st[u], st[s], sizeof(st[u])) == 0)
-			return false;
-		u = next[u];
+struct Node{
+	int a[3], m;
+	Node() {
+		F(i, 3) a[i] = 0;
+		m = 0;
 	}
-	return true;
-}
+	bool operator < (const Node& rhs) const {
+		return m > rhs.m;
+	}
+};
+
+priority_queue<Node> q;
 
 int main() {
 #ifdef LOCAL
     freopen("in", "r", stdin);
     // freopen("out", "w", stdout);
 #endif
-	
+	int T;
+	s(T);
+	while(T--) {
+		Node start;
+		s(a[0]),s(a[1]),s(a[2]),s(d);
+		start.a[2] = a[2];
+		MEM(vis, 0);
+		while(!q.empty()) q.pop();
+		q.push(start);
+		vis[start.a[0]][start.a[1]] = true;
+		int ansp = INF, dis = INF;
+		while(!q.empty()) {
+			Node u = q.top(); q.pop();
+			// whatis(u.m), whatis(u.a[0]), whatis(u.a[1]), whatis(u.a[2]);
+			F(i, 3) if(d >= u.a[i] && d - u.a[i] < dis) {
+				dis = d - u.a[i];
+				ansp = u.m;
+			} 
+			if (!dis) break;
+			F(i, 3) F(j, 3) if(i != j) {
+				int p = min(u.a[i], a[j] - u.a[j]);
+				Node t; 
+				t.a[i] = u.a[i] - p;
+				t.a[j] = u.a[j] + p;
+				t.a[3-i-j] = a[2] - t.a[i] - t.a[j];
+				if (!vis[t.a[0]][t.a[1]]) {
+					vis[t.a[0]][t.a[1]] = true;
+					t.m = u.m + p;
+					q.push(t);
+				}
+			}
+		}
+		printf("%d %d\n", ansp, d - dis);
+	}
 	return 0;
 }

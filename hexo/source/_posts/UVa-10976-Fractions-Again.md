@@ -1,5 +1,5 @@
 ---
-title: UVa 10976 - Fractions Again?! [1]
+title: UVa 10976 Fractions Again?! [1]
 date: 2016-10-21 21:35:26
 categories:
 - apoc

@@ -1,5 +1,5 @@
 ---
-title: UVa - 524 Prime Ring Problem [2]
+title: UVa 524 Prime Ring Problem [2]
 categories:
 - apoc
 - 07-暴力求解法

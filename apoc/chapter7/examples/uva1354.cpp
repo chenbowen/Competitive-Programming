@@ -53,26 +53,30 @@ const double eps = 1e-9;
 #define LLD                         "%I64d"
 #endif
 #define sl(n)                       scanf(LLD,&(n))
-
-const int N = 5002;
-const int hashsize = 1000003;
-int head[hashsize], next[hashsize];
-void init_lookup_table() {MEM(head, 0);}
-int hash(State& s) {
-	// 将状态转成整数
-	// ...
-	return v%hashsize;
-}
-bool try_to_insert(int s) {
-	int h = hash(st[s]);
-	int u = head[h];
-	while (u) {
-		// 判重
-		if (memcmp(st[u], st[s], sizeof(st[u])) == 0)
-			return false;
-		u = next[u];
+const int N = 6+1;
+int n;
+bool vis[1<<N];
+double a[N], maxr, sum[1<<N];
+vector<pair<double, double> > mem[1<<N];
+void dfs(int subset) {
+	if (vis[subset]) return;
+	vis[subset] = true;
+	bool have_children = false;
+	for(int left=(subset-1)&subset; left; left=(left-1)&subset) {
+		have_children = true;
+		int right = subset^left;
+		dfs(left); dfs(right);
+		double l = sum[right] / sum[subset];
+		double r = sum[left] / sum[subset];
+		F(i, sz(mem[left])) 
+			F(j, sz(mem[right])) {
+				double ll = max(mem[left][i].fi+l, mem[right][j].fi-r);
+				double rr = max(mem[right][j].se+r, mem[left][i].se-l);
+				if (ll+rr < maxr)
+					mem[subset].pb(mp(ll, rr));
+			}
 	}
-	return true;
+	if (!have_children) mem[subset].pb(mp(0, 0));
 }
 
 int main() {
@@ -80,6 +84,24 @@ int main() {
     freopen("in", "r", stdin);
     // freopen("out", "w", stdout);
 #endif
-	
+    int T;
+    s(T);
+    while(T--) {
+		sf(maxr),s(n);
+		F(i, n) sf(a[i]);
+		F(i, 1<<n) {
+			sum[i] = 0;
+			F(j, n) if (i&(1<<j)) 
+				sum[i] += a[j];
+			mem[i].clear();
+		}
+		MEM(vis, 0);
+		int allset = (1<<n)-1;
+		dfs(allset);
+		double ans = -1;
+		F(i, sz(mem[allset])) 
+			ans = max(ans, mem[allset][i].fi+mem[allset][i].se);
+		printf("%.10f\n", ans);
+    }
 	return 0;
 }

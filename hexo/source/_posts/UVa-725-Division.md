@@ -1,5 +1,5 @@
 ---
-title: UVa 725 - Division [1]
+title: UVa 725 Division [1]
 date: 2016-10-21 20:04:36
 tags:
 - brute force
