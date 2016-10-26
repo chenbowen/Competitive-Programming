@@ -1,6 +1,6 @@
 /**
  * @authors Bowen Chen (chenbowen9612@gmail.com)
- * @date    2016-10-24
+ * @date    2016-10-25
  */
 #include <iostream>
 #include <cstdio>
@@ -53,30 +53,38 @@ const double eps = 1e-9;
 #define LLD                         "%I64d"
 #endif
 #define sl(n)                       scanf(LLD,&(n))
-const int N = 5002;
-int ans[N], t[N], maxd;
+const int N = 9;
+int n, maxd, a[N];
 
-bool better() {
-	FD(i, maxd+1) if (t[i] < ans[i] || ans[i] == -1) return true;
-	return false; 
+int h() {
+	int cnt = 0;
+	F(i, n-1) if (a[i+1] != a[i]+1)
+		cnt++;
+	if (a[n-1] != n) cnt++;
+	return cnt;
 }
 
-bool dfs(int d, int from, int a, int b) {
-	if (d == maxd) {
-		if (b % a) return false;
-		t[d] = b;
-		if (better()) memcpy(&ans, &t, sizeof(int) * maxd+1);
+bool dfs(int d) {
+	if (h() + 3*d > 3*maxd) return false;
+	if(d == maxd) {
+		F(i, n) if(a[i] != i+1) return false;
 		return true;
 	}
-	bool ok = false;
-	for(int c = from; ; c++) {
-		if (a*c >= (maxd-d+1)*b) return false;
-		int g = gcd(a*c-b, b*c);
-		t[d] = c;
-		if (dfs(d+1, c+1, (a*c - b)/g, (b*c)/g)) 
-			ok = true;
+	int t[N], b[N]; memcpy(t, a, sizeof(a));
+	F(i, n) for(int j = i; j < n; j++) {
+		int cnt = 0;
+		F(k, n) if(k < i || k > j) 
+			b[cnt++] = a[k];
+		F(k, cnt) {
+			int cnt2 = 0;
+			F(p, k) a[cnt2++] = b[p];
+			for(int p = i; p <= j; p++) a[cnt2++] = t[p];
+			for(int p = k; p < cnt; p++) a[cnt2++] = b[p];
+			if (dfs(d+1)) return true;
+			memcpy(a, t, sizeof(a));
+		}
 	}
-	return ok;
+	return false;
 }
 
 int main() {
@@ -84,16 +92,15 @@ int main() {
     freopen("in", "r", stdin);
     // freopen("out", "w", stdout);
 #endif
-	int a, b;
-	while(s(a), s(b)) {
-		for(maxd = 1; ; maxd++) {
-			MEM(ans, -1);
-			if (dfs(0, 2, a, b))
+
+    int kase = 0;
+	while(s(n) == 1 && n) {
+		F(i, n) s(a[i]);
+		for(maxd = 0; maxd < N; maxd++) 
+			if (dfs(0)) {
+				printf("Case %d: %d\n", ++kase, maxd);
 				break;
-		}
-		printf("%d/%d=", a, b);
-		F(i, maxd+1) printf("1/%d+", ans[i]);
-		printf("\n");
+			}
 	}
 	return 0;
 }
