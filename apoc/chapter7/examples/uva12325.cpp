@@ -69,11 +69,11 @@ int main() {
 			int n2 = (n-s1*n1)/s2;
 			int ans2 = n1*v1+n2*v2, t;
 			while(n1>0) {
-				if(s1>=s2) {
+				if(s1>=s2){
 					n1--; 
 					n2 = (n-s1*n1)/s2;
 				}
-				else {
+				else{
 					n2++;
 					if(n < s2*n2) break;
 					n1 = (n-s2*n2)/s1;
