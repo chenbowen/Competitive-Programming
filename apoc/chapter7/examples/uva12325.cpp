@@ -60,31 +60,17 @@ int main() {
 	s(T);
 	while(T--) {
 		sl(n), sl(s1), sl(v1), sl(s2), sl(v2);
-		if(v2*s1 > v1*s2) swap(s1, s2), swap(v1, v2);
-		LL l = s1*s2 / gcd(s1, s2);
-		int ans = (n/l)*(l/s1)*v1;
-		n %= l;
-		if (n) {
-			int n1 = n/s1;
-			int n2 = (n-s1*n1)/s2;
-			int ans2 = n1*v1+n2*v2, t;
-			while(n1>0) {
-				if(s1>=s2){
-					n1--; 
-					n2 = (n-s1*n1)/s2;
-				}
-				else{
-					n2++;
-					if(n < s2*n2) break;
-					n1 = (n-s2*n2)/s1;
-				}
-				t = n1*v1+n2*v2;
-				if(t <= ans2) break;
-				ans2 = t;
-			}
-			ans += ans2;
+		if(s1 > s2) swap(s1, s2), swap(v1, v2);
+		LL ans = 0;
+		if (n / s2 > 60000) {
+			F(i, s1) ans = max(ans, v2*i+(n-s2*i)/s1*v1);
+			F(i, s2) ans = max(ans, v1*i+(n-s1*i)/s2*v2);
 		}
-		printf("Case #%d: %d\n", ++kase, ans);
+		else {
+			int maxs2 = n/s2;
+			F(i, maxs2) ans = max(ans, v2*i+(n-s2*i)/s1*v1);
+		}
+		printf("Case #%d: %lld\n", ++kase, ans);
 	}
 	return 0;
 }
