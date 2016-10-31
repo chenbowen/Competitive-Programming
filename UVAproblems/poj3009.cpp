@@ -56,15 +56,19 @@ const double eps = 1e-9;
 const int N = 21;
 const int maxd = 10;
 int r, c, s[N][N];
-bool vis[N][N];
+// bool vis[N][N];
 struct Node{
 	PII p, path[maxd];
 	int d;
+	Node() {
+		p = mp(-1, -1);
+		d = 0;
+	}
 };
 int dx[] = {0, -1, 0, 1}, dy[] = {1, 0, -1, 0};
 
-inline bool inside(PII &p) {
-	return p.fi >= 0 && p.se >= 0 && p.fi < r && p.se < c;
+inline bool inside(int x, int y) {
+	return x >= 0 && y >= 0 && x < r && y < c;
 }
 int main() {
 #ifdef LOCAL
@@ -73,42 +77,35 @@ int main() {
 #endif
 	while(s(c), s(r) == 1 && r) {
 		Node start;
-		PII goal;
 		F(i, r) F(j, c) {
 			s(s[i][j]);
-			if (s[i][j] == 2) start.p = mp(i, j);
-			else if (s[i][j] == 3) goal = mp(i, j);
+			if(s[i][j] == 2) { start.p = mp(i, j); s[i][j] = 0;}
 		}
 		queue<Node> q;
-		MEM(vis, 0)
+		// MEM(vis, 0);
 		q.push(start);
-		vis[start.p.fi][start.p.se] = true;
+		// vis[start.p.fi][start.p.se] = true;
 		bool ok = false;
 		while(!q.empty()) {
 			Node u = q.front(); q.pop();
-			if (u.p == goal) { ok = true; 
-			else if (u.d > 9) break;
-			PII t;
-			F(i, 4) {
-				t = u.p;
-				for(int nx=t.fi+dx[i],ny=t.se+dy[i]; valid(nx, ny); nx+=dx[i],ny+=dy[i]) {
-					if(s[nx][ny] == '2') {ok = true; printf("%d\n", u.d); break;}
-					else if(s[nx][ny] == '1') {
-						bool find = false;
-						F(j, u.d) if (u.path[j].fi == nx && u.path[j].se == ny) {find = true; break;}
-						if(!find) {
-							Node tt; memcpy(&tt, &u, sizeof(u));
-							tt.path[++tt.d] = mp(nx, ny);
-							tt.p = mp(nx-dx[i],ny-dy[i]);
-							q.push(tt); 
-							break;
-						}
-					}
+			// whatis(u.d);whatis(u.p.fi);whatis(u.p.se);
+			if (u.d > 9) break;
+			F(i, u.d) s[u.path[i].fi][u.path[i].se] = 0;
+			F(i, 4){
+				int nx = u.p.fi+dx[i], ny = u.p.se+dy[i];
+				while(inside(nx, ny)&&!s[nx][ny]) nx+=dx[i],ny+=dy[i];
+
+				if(!inside(nx, ny)) continue;
+				if(s[nx][ny] == 3) {ok=true;printf("%d\n", u.d+1);break;}
+				else if(u.p.fi+dx[i]==nx&&u.p.se+dy[i]==ny) continue;
+				else {
+					Node tt; memcpy(&tt, &u, sizeof(u));tt.path[tt.d++]=mp(nx, ny);tt.p=mp(nx-dx[i],ny-dy[i]);
+					// vis[tt.p.fi][tt.p.se] = true;
+					q.push(tt);
 				}
-				if (ok) break;
-				if(!valid(t.fi, t.se)) continue;
 			}
 			if(ok) break;
+			F(i, u.d) s[u.path[i].fi][u.path[i].se] = 1;
 		}
 		if (!ok) printf("-1\n");
 	}

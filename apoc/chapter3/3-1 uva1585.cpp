@@ -8,8 +8,6 @@ using namespace std;
 #define N 100
 char a[N];
 
-#define LOCAL
-
 int main() {
 #ifdef LOCAL
     freopen("in.txt", "r", stdin);
