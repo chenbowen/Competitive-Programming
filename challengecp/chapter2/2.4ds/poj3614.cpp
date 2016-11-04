@@ -1,6 +1,6 @@
 /**
  * @authors Bowen Chen (chenbowen9612@gmail.com)
- * @date    2016-11-01
+ * @date    2016-11-03
  */
 #include <iostream>
 #include <cstdio>
@@ -26,8 +26,7 @@ typedef pair<int, int> PII;
 typedef set<int> SI;
 typedef long long LL;
 const int INF = 0x3f3f3f3f;
-const double eps = 1e-9;
-#define _ ios_base::sync_with_stdio(0);cin.tie(0);
+const double eps = 1e-8;
 #define bitcount                    __builtin_popcount
 #define gcd                         __gcd
 #define F(i,n)                      for(int i=0;i<(n);++i)
@@ -43,35 +42,40 @@ const double eps = 1e-9;
 #define se                          second
 #define pb                          push_back
 #define sz(a)                       ((int)(a.size()))
-#define s(n)                        scanf("%d",&(n))
-#define sc(n)                       scanf("%c",&(n))
-#define sf(n)                       scanf("%lf",&(n))
-#define ss(n)                       scanf("%s",(n))
+#define SI(n)                       scanf("%d",&(n))
+#define SII(a,b)                    scanf("%d%d",&(a),&(b))
+#define SC(n)                       scanf("%c",&(n))
+#define SF(n)                       scanf("%lf",&(n))
+#define SS(n)                       scanf("%s",(n))
+#define PI(n)                       printf("%d\n",(n))
 #ifdef LOCAL
 #define LLD                         "%lld"
 #else
 #define LLD                         "%I64d"
 #endif
 #define sl(n)                       scanf(LLD,&(n))
-const int N = 102;
-int n;
-double a[N];
-double calc(double x, double y) {
-	return 2.0*sqrt(x*y);
-}
+const int N = 2502;
+int n, l;
+PII cow[N], bot[N];
 
 int main() {
 #ifdef LOCAL
     freopen("in", "r", stdin);
     // freopen("out", "w", stdout);
 #endif
-	s(n);
-	F(i, n) sf(a[i]);
-	sort(a, a+n);
-	double ans = a[n-1];
-	FD(i, n-1) {
-		ans = calc(ans, a[i]);
+	SII(n, l);
+	F(i, n) SII(cow[i].fi, cow[i].se);
+	F(i, l) SII(bot[i].fi, bot[i].se);
+	sort(cow, cow+n); sort(bot, bot+l);
+	priority_queue<int, vector<int>, greater<int> > q;
+	int j = 0, t, cnt = 0;
+	F(i, l) {
+		while(j < n && cow[j].fi <= bot[i].fi) q.push(cow[j++].se);
+		while(bot[i].se && !q.empty()) {
+			t = q.top(); q.pop();
+			if(t >= bot[i].fi) cnt++, --bot[i].se;
+		}
 	}
-	printf("%.3f\n", ans);
+	PI(cnt);
 	return 0;
 }

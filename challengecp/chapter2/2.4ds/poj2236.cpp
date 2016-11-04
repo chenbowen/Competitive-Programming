@@ -1,6 +1,6 @@
 /**
  * @authors Bowen Chen (chenbowen9612@gmail.com)
- * @date    2016-10-30
+ * @date    2016-11-04
  */
 #include <iostream>
 #include <cstdio>
@@ -26,8 +26,7 @@ typedef pair<int, int> PII;
 typedef set<int> SI;
 typedef long long LL;
 const int INF = 0x3f3f3f3f;
-const double eps = 1e-9;
-#define _ ios_base::sync_with_stdio(0);cin.tie(0);
+const double eps = 1e-8;
 #define bitcount                    __builtin_popcount
 #define gcd                         __gcd
 #define F(i,n)                      for(int i=0;i<(n);++i)
@@ -43,42 +42,50 @@ const double eps = 1e-9;
 #define se                          second
 #define pb                          push_back
 #define sz(a)                       ((int)(a.size()))
-#define s(n)                        scanf("%d",&(n))
-#define sc(n)                       scanf("%c",&(n))
-#define sf(n)                       scanf("%lf",&(n))
-#define ss(n)                       scanf("%s",(n))
+#define SI(n)                       scanf("%d",&(n))
+#define SII(a,b)                    scanf("%d%d",&(a),&(b))
+#define SIII(a,b,c)                 scanf("%d%d%d",&(a),&(b),&(c))
+#define SC(n)                       scanf("%c",&(n))
+#define SF(n)                       scanf("%lf",&(n))
+#define SFF(a,b)                    scanf("%lf%lf",&(a),&(b))
+#define SS(n)                       scanf("%s",(n))
+#define PI(n)                       printf("%d\n",(n))
 #ifdef LOCAL
 #define LLD                         "%lld"
 #else
 #define LLD                         "%I64d"
 #endif
 #define sl(n)                       scanf(LLD,&(n))
-const int N = 50005;
-int n, k, father[3*N], depth[3*N];
+const int N = 1002;
+int n, par[N], dep[N], f[N];
+double d;
+pair<double, double> data[N];
 
-void dsu_init() {
-	F(i, 3*(n+1)) {
-		father[i] = i;
-		depth[i] = 1;
-	}
+vector<int> G[N];
+
+bool valid(pair<double, double> &x, pair<double, double> &y) {
+	double dist = sqrt((x.fi-y.fi)*(x.fi-y.fi)+(x.se-y.se)*(x.se-y.se));
+	if(abs(dist - d) < eps) return true;
+	return dist < d;
+}
+
+void dsu_init() { 
+	F(i, n) par[i+1] = i+1;
 }
 
 int dsu_find(int x) {
-	if(father[x] == x) return x;
-	return father[x] = dsu_find(father[x]);
+	if(par[x] == x) return x;
+	return par[x] = dsu_find(par[x]);
 }
 
-int dsu_union(int x, int y) {
-	int f1 = dsu_find(x), f2 = dsu_find(y);
-	if(depth[f1] <= depth[f2]) {
-		if(depth[f1] == depth[f2]) depth[f2]++;
-		return father[f1] = f2;
-	}
-	return father[f2] = f1;
-}
+void dsu_union(int x, int y) {
+	int fx = dsu_find(x), fy = dsu_find(y);
+	if(fx == fy) return; 
 
-bool sameset(int x, int y) {
-	return dsu_find(x) == dsu_find(y);
+	if(dep[fx] <= dep[fy]) {
+		par[fx] = fy;
+		if(dep[fx] == dep[fy]) dep[fy]++;
+	} else par[fy] = fx;
 }
 
 int main() {
@@ -86,24 +93,32 @@ int main() {
     freopen("in", "r", stdin);
     // freopen("out", "w", stdout);
 #endif
-	s(n),s(k);
+	SI(n), SF(d);
+	F(i, n) SFF(data[i+1].fi, data[i+1].se);
+
+	for(int i = 1; i <= n; i++)
+		for(int j = i+1; j <= n; j++)
+			if(valid(data[i], data[j])) {
+				G[i].pb(j);
+				G[j].pb(i);
+			}
+
 	dsu_init();
-	int d, t1, t2, cnt = 0;
-	F(i, k) {
-		scanf("%d%d%d", &d, &t1, &t2);
-		if(t1 > n || t2 > n || t1 < 1 || t2 < 1) {cnt++; continue;}
-		if(d == 1) {
-			if(sameset(t2+2*n, t1) || sameset(t2+n, t1)) {cnt++; continue;}
-			dsu_union(t1, t2);
-			dsu_union(t1+n, t2+n);
-			dsu_union(t1+2*n, t2+2*n);
+	char cmd;  int x, y;
+	getchar();
+	while(SC(cmd) == 1) {
+		if(cmd == 'O') {
+			SI(x);
+			if(f[x]) continue;
+			vector<int> &v = G[x];
+			f[x] = true;
+			F(i, sz(v)) if(f[v[i]]) dsu_union(x, v[i]);
 		} else {
-			if(sameset(t1, t2) || sameset(t2+2*n, t1)) {cnt++; continue;}
-			dsu_union(t1+2*n, t2);
-			dsu_union(t2+n, t1);
-			dsu_union(t1+n, t2+2*n);
+			SII(x, y);
+			if(dsu_find(x) == dsu_find(y)) printf("SUCCESS\n");
+			else printf("FAIL\n");
 		}
+		getchar();
 	}
-	printf("%d", cnt);
 	return 0;
 }

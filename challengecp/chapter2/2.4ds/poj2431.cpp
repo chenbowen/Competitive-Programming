@@ -1,6 +1,6 @@
 /**
  * @authors Bowen Chen (chenbowen9612@gmail.com)
- * @date    2016-11-01
+ * @date    2016-11-02
  */
 #include <iostream>
 #include <cstdio>
@@ -53,25 +53,39 @@ const double eps = 1e-9;
 #define LLD                         "%I64d"
 #endif
 #define sl(n)                       scanf(LLD,&(n))
-const int N = 102;
-int n;
-double a[N];
-double calc(double x, double y) {
-	return 2.0*sqrt(x*y);
-}
+const int N = 10003;
+int n, l, p, cnt;
+PII a[N];
 
+class cmp{
+public:
+	bool operator() (PII &lhs, PII &rhs) {
+		return lhs.se < rhs.se || (lhs.se == rhs.se && lhs.fi < rhs.fi);
+	}
+};
+priority_queue<PII, vector<PII>, cmp> q;
 int main() {
 #ifdef LOCAL
     freopen("in", "r", stdin);
     // freopen("out", "w", stdout);
 #endif
 	s(n);
-	F(i, n) sf(a[i]);
+	F(i, n) s(a[i].fi), s(a[i].se);
+	s(l), s(p);
+	a[n].fi = l; a[n++].se = 0; 
+	F(i, n-1) a[i].fi = l - a[i].fi;
 	sort(a, a+n);
-	double ans = a[n-1];
-	FD(i, n-1) {
-		ans = calc(ans, a[i]);
+	bool ok = true;
+	F(i, n) {
+		while(a[i].fi > p) {
+			if(q.empty()) {ok = false; break;}
+			p += q.top().se; q.pop();
+			cnt++;
+		}
+		if(!ok) break;
+		q.push(a[i]);
 	}
-	printf("%.3f\n", ans);
+	if(!ok) printf("-1\n");
+	else printf("%d\n", cnt);
 	return 0;
 }

@@ -1,6 +1,6 @@
 /**
  * @authors Bowen Chen (chenbowen9612@gmail.com)
- * @date    2016-11-01
+ * @date    2016-11-03
  */
 #include <iostream>
 #include <cstdio>
@@ -26,8 +26,7 @@ typedef pair<int, int> PII;
 typedef set<int> SI;
 typedef long long LL;
 const int INF = 0x3f3f3f3f;
-const double eps = 1e-9;
-#define _ ios_base::sync_with_stdio(0);cin.tie(0);
+const double eps = 1e-8;
 #define bitcount                    __builtin_popcount
 #define gcd                         __gcd
 #define F(i,n)                      for(int i=0;i<(n);++i)
@@ -43,35 +42,56 @@ const double eps = 1e-9;
 #define se                          second
 #define pb                          push_back
 #define sz(a)                       ((int)(a.size()))
-#define s(n)                        scanf("%d",&(n))
-#define sc(n)                       scanf("%c",&(n))
-#define sf(n)                       scanf("%lf",&(n))
-#define ss(n)                       scanf("%s",(n))
+#define SI(n)                       scanf("%d",&(n))
+#define SII(a,b)                    scanf("%d%d",&(a),&(b))
+#define SIII(a,b,c)                 scanf("%d%d%d",&(a),&(b),&(c))
+#define SC(n)                       scanf("%c",&(n))
+#define SF(n)                       scanf("%lf",&(n))
+#define SS(n)                       scanf("%s",(n))
+#define PI(n)                       printf("%d\n",(n))
 #ifdef LOCAL
 #define LLD                         "%lld"
 #else
 #define LLD                         "%I64d"
 #endif
 #define sl(n)                       scanf(LLD,&(n))
-const int N = 102;
-int n;
-double a[N];
-double calc(double x, double y) {
-	return 2.0*sqrt(x*y);
-}
+const int N = 100002;
+int n, c, f, lower[N], upper[N];
+PII a[N];
 
 int main() {
 #ifdef LOCAL
     freopen("in", "r", stdin);
     // freopen("out", "w", stdout);
 #endif
-	s(n);
-	F(i, n) sf(a[i]);
-	sort(a, a+n);
-	double ans = a[n-1];
-	FD(i, n-1) {
-		ans = calc(ans, a[i]);
+	SIII(n, c, f);
+	int half = n / 2;
+	F(i, c) SII(a[i].fi, a[i].se);
+	sort(a, a + c);
+
+	int total = 0;
+	priority_queue<int> q;
+	F(i, c){
+		lower[i] = q.size() == half ? total : INF;
+		q.push(a[i].se);
+		total += a[i].se;
+		if (q.size() > half) { total -= q.top(); q.pop();}
 	}
-	printf("%.3f\n", ans);
+	while(!q.empty()) q.pop();
+ 
+	total = 0;
+	FD(i, c){
+		upper[i] = q.size() == half ? total : INF;
+		q.push(a[i].se);
+		total += a[i].se;
+		if (q.size() > half) {total -= q.top(); q.pop();}
+	}
+ 
+	int result = -1;
+	FD(i, c) if (lower[i] + a[i].se + upper[i] <= f){
+		result = a[i].fi;
+		break;
+	}
+	PI(result);
 	return 0;
 }
