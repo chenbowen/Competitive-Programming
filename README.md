@@ -1,1 +1,1 @@
-# ACM-code
+Mainly written for fun.
